@@ -16,89 +16,50 @@ public class PlayerBehavior : MonoBehaviour
     {
         // move
         parseWASD();
-        updateRotation();
-        moveSelf();
     }
 
-    private float upDirection = 0.0f;
-    private float rightDirection = 0.0f;
-    private Vector3 direction = new Vector3(0.0f, 0.0f, 0.0f);
     public void parseWASD()
     {
-        upDirection = 0.0f;
-        rightDirection = 0.0f;
-        if (Input.GetKey(KeyCode.W))
-        {
-            upDirection++;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            upDirection--;
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            rightDirection--;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            rightDirection++;
-        }
-        direction = new Vector3(rightDirection, upDirection, 0.0f);
+        float upDirection = 0.0f;
+        float rightDirection = 0.0f;
+
+        if (Input.GetKey(KeyCode.W)) upDirection++;
+        if (Input.GetKey(KeyCode.S)) upDirection--;
+        if (Input.GetKey(KeyCode.A)) rightDirection--;
+        if (Input.GetKey(KeyCode.D)) rightDirection++;
+
+        Vector3 direction = new Vector3(rightDirection, upDirection, 0.0f);
         direction.Normalize();
+        moveSelf(direction);
+        updateRotation(direction);
     }
-    // WASD move translates transform.position
-    public void moveSelf()
+    private void moveSelf(Vector3 direction)
     {
         this.transform.position += direction * Time.deltaTime * PLAYER_SPEED;
     }
-    // set player rotation in direction
-    public void updateRotation()
+    
+    private void updateRotation(Vector3 direction)
     {
-        // set player rotation to look in direction vector direction, rotating only z rotation
         if (direction.x == 0 && direction.y == 0)
         {
-            // do nothing
+            // idle
         }
         else if (direction.x < 0)
         {
-            if (direction.y < 0)
-            {
-                this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 135.0f);
-            }
-            else if (direction.y == 0)
-            {
-                this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 90.0f);
-            }
-            else if (direction.y > 0)
-            {
-                this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 45.0f);
-            }
+            if      (direction.y < 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 135.0f);
+            else if (direction.y == 0)  this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 90.0f);
+            else if (direction.y > 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 45.0f);
         }
         else if (direction.x == 0)
         {
-            if (direction.y < 0)
-            {
-                this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 180.0f);
-            }
-            else if (direction.y > 0)
-            {
-                this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
-            }
+            if      (direction.y < 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 180.0f);
+            else if (direction.y > 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
         }
         else if (direction.x > 0)
         {
-            if (direction.y < 0)
-            {
-                this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -135.0f);
-            }
-            else if (direction.y == 0)
-            {
-                this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -90.0f);
-            }
-            else if (direction.y > 0)
-            {
-                this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -45.0f);
-            }
+            if      (direction.y < 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -135.0f);
+            else if (direction.y == 0)  this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -90.0f);
+            else if (direction.y > 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -45.0f);
         }
     }
 
