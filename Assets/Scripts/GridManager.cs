@@ -19,8 +19,6 @@ public class GridManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public const bool DEBUG_SHOW_ALL = true; // initializes all fog objects to inactive for debug purposes.
-                                              // should be false in final build.
     public const bool DEBUG_CLICK_FLOWMAP = false; // enables click to generate + show flowmap.
                                                    // should be false in final build.
     public GameObject wallPrefab;
@@ -45,7 +43,7 @@ public class GridManager : MonoBehaviour
         "||||......|......|...|\n" +
         "|.........|......|...|\n" +
         "|....|....|..........|\n" +
-        "|s...|....|..........|\n" +
+        "|s..................|....|..........|\n" +
         "||||||||||||||||||||||";
 
     public class Cell
@@ -56,7 +54,7 @@ public class GridManager : MonoBehaviour
         public Cell(GameObject terrainPrefab,
                     int x, int y)
         {
-            this.terrainObject = Instantiate(terrainPrefab, new Vector3(x * TILE_SIZE, y * TILE_SIZE, 0), Quaternion.identity);
+            this.terrainObject = Instantiate(terrainPrefab, new Vector3(x * TILE_SIZE + TILE_SIZE/2, y * TILE_SIZE + TILE_SIZE/2, 0), Quaternion.identity);
             // initialize pathingValue to max int value
             this.pathingWeight = int.MaxValue;
             this.position = new Vector2(x * TILE_SIZE, y * TILE_SIZE);
@@ -70,7 +68,7 @@ public class GridManager : MonoBehaviour
             terrainObject.transform.parent = parent.transform;
         }
     }
-    public Cell[][] grid;
+    public List<List<Cell>> grid;
     public Vector2 startingPoint;
 
     public float getTileSize()
@@ -96,39 +94,75 @@ public class GridManager : MonoBehaviour
     public void generateGrid(string gridString)
     {
         string[] rows = gridString.Split('\n');
-        grid = new Cell[rows.Length][];
+        grid = new List<List<Cell>>();
         for (int i = 0; i < rows.Length; i++)   // 0 to rows length (top to bottom of gridString)
         {
-            char[] cells = rows[i].ToCharArray();  // split the row into cells
+            //Debug.Log("string: " + rows[i] + " flippedY: " + (rows.Length - 1 - i));
             int flippedY = rows.Length - 1 - i;
-            grid[flippedY] = new Cell[cells.Length];      // initialize a new row for grid.
+            char[] cells = rows[flippedY].ToCharArray();  // split the row into cells
+            List<Cell> row = new List<Cell>();      // initialize a new row for grid.
             for (int j = 0; j < cells.Length; j++)
             {
+                Cell newCell;
                 switch (cells[j])
                 {
                     case '.':
-                        grid[flippedY][j] = new Cell(floorPrefab,
-                                              j, flippedY);
+                        newCell = new Cell(floorPrefab,
+                                              j, i);
                         break;
                     case '|':
-                        grid[flippedY][j] = new Cell(wallPrefab,
-                                              j, flippedY);
+                        newCell = new Cell(wallPrefab,
+                                              j, i);
                         break;
                     case 's':
-                        grid[flippedY][j] = new Cell(startingPointPrefab,
-                                              j, flippedY);
+                        newCell = new Cell(startingPointPrefab,
+                                              j, i);
                         // put the player at the starting point
-                        GameManager.Instance.getPlayer().transform.position = new Vector3(j * TILE_SIZE, flippedY * TILE_SIZE, 0);
-                        startingPoint = new Vector2(j * TILE_SIZE, flippedY * TILE_SIZE);
+                        GameManager.Instance.getPlayer().transform.position = new Vector3(
+                            j * TILE_SIZE + TILE_SIZE/2, 
+                            i * TILE_SIZE + TILE_SIZE/2, 
+                            0);
+                        startingPoint = new Vector2(j * TILE_SIZE, i * TILE_SIZE);
                         break;
                     default:
-                        grid[flippedY][j] = null;
+                        newCell = null;
                         break;
                 }
-                if (grid[flippedY][j] != null)
-                    grid[flippedY][j].childTo(this.gameObject);
+                row.Add(newCell);
+
+                if (newCell != null)
+                    newCell.childTo(this.gameObject);
             }
+            grid.Add(row);
         }
+    }
+
+    public void debugGridPrint()
+    {
+        string gridString = "Grid:\n";
+        // print a formatted 2d string according to grid
+        for (int i = 0; i < grid.Count; i++)
+        {
+            string row = "" + i + ":";
+            for (int spaces = 0; spaces < 2 - i.ToString().Length; spaces++)
+            {
+                row += " ";
+            }
+            for (int j = 0; j < grid[i].Count; j++)
+            {
+                if (grid[i][j] != null)
+                {
+                    char terrainTypeAbbreviated = grid[i][j].getTerrainType()[0];
+                    row += terrainTypeAbbreviated;
+                }
+                else
+                {
+                    row += " ";
+                }
+            }
+            gridString += row + "\n";
+        }
+        Debug.Log(gridString);
     }
 
     public Vector2 getLowestNeighbor(Vector2 position)
@@ -147,7 +181,7 @@ public class GridManager : MonoBehaviour
                 lowestCell = grid[y - 1][x];
             }
         }
-        if (y < grid.Length - 1)
+        if (y < grid.Count - 1)
         {
             if (grid[y + 1][x].pathingWeight < lowestWeight)
             {
@@ -163,7 +197,7 @@ public class GridManager : MonoBehaviour
                 lowestCell = grid[y][x - 1];
             }
         }
-        if (x < grid[y].Length - 1)
+        if (x < grid[y].Count - 1)
         {
             if (grid[y][x + 1].pathingWeight < lowestWeight)
             {
@@ -182,9 +216,9 @@ public class GridManager : MonoBehaviour
 
     public void initializeFlowmapWeights()
     {
-        for (int i = 0; i < grid.Length; i++)
+        for (int i = 0; i < grid.Count; i++)
         {
-            for (int j = 0; j < grid[i].Length; j++)
+            for (int j = 0; j < grid[i].Count; j++)
             {
                 grid[i][j].pathingWeight = -1;
                 if (getCellType(j, i) == "Wall" || getCellType(j, i) == "Spikes")
@@ -198,11 +232,13 @@ public class GridManager : MonoBehaviour
     {
         // breadth first search of grid starting at origin point x, y
         // set pathingWeight of each cell to the distance from x, y
-
         // initialize all pathingWeights to -1 to indicate unvisited.
-        for (int i = 0; i < grid.Length; i++)
+
+        debugGridPrint();
+
+        for (int i = 0; i < grid.Count; i++)
         {
-            for (int j = 0; j < grid[i].Length; j++)
+            for (int j = 0; j < grid[i].Count; j++)
             {
                 if (grid[i][j] != null)
                     grid[i][j].pathingWeight = -1;
@@ -227,23 +263,31 @@ public class GridManager : MonoBehaviour
             {
                 int nx = (int)neighbor.x;
                 int ny = (int)neighbor.y;
-                if (nx >= 0 && nx < grid[ny].Length && ny >= 0 && ny < grid.Length)
+
+                if (nx >= 0 || nx < grid[ny].Count || ny >= 0 || ny < grid.Count)
                 {
-                    if (grid[ny][nx] != null)
-                    {
-                        if (grid[ny][nx].pathingWeight == -1)       // if unvisited
-                        {
-                            if (tileIsEnemyPathable(nx, ny))        // and not wall/spike/null
-                            {
-                                grid[ny][nx].pathingWeight = distance + 1; // set tile distance
-                                queue.Enqueue(neighbor);                   // add to queue
-                            }
-                            else
-                            {
-                                grid[ny][nx].pathingWeight = int.MaxValue; // set to max value to indicate impassable
-                            }
-                        }
-                    }
+                    Debug.Log("failed bounds check at neighbor: " + nx + " " + ny);
+                    continue; // neighbor bounds check.
+                }
+
+                if (grid[ny][nx] == null)
+                {
+                    Debug.Log("failed null check at neighbor: " + nx + " " + ny);
+                    continue; // existing tile check.
+                }
+
+                if (grid[ny][nx].pathingWeight != -1)
+                    continue; // visited check
+
+                Debug.Log("checks passed");
+                if (tileIsEnemyPathable(nx, ny))               // not wall. destructibles should be set to pathable.
+                {
+                    grid[ny][nx].pathingWeight = distance + 1; // set tile distance
+                    queue.Enqueue(neighbor);                   // add to queue
+                }
+                else
+                {
+                    grid[ny][nx].pathingWeight = int.MaxValue; // set to max value to indicate impassable
                 }
             }
         }
@@ -286,8 +330,6 @@ public class GridManager : MonoBehaviour
             Vector2 coords = getMouseCoords();
             int tileX = getTileX(coords);
             int tileY = getTileY(coords);
-            Debug.Log("Clicked " + coords);
-            Debug.Log("X: " + tileX + " Y: " + tileY);
             if (isValidOrigin(tileX, tileY))
             {
                 recalcFlowmapWeights(tileX, tileY);
@@ -299,9 +341,9 @@ public class GridManager : MonoBehaviour
     public bool isValidOrigin(int x, int y)
     {
         // if the coordinate is within the grid, and is not null, wall, or spike, return true;
-        if (y >= 0 && y < grid.Length)
+        if (y >= 0 && y < grid.Count)
         {
-            if (x >= 0 && x < grid[y].Length)
+            if (x >= 0 && x < grid[y].Count)
             {
                 if (grid[y][x] != null)
                 {
@@ -322,13 +364,14 @@ public class GridManager : MonoBehaviour
 
             Destroy(square);
         }
-        for (int i = 0; i < grid.Length; i++)
+        for (int i = 0; i < grid.Count; i++)
         {
-            for (int j = 0; j < grid[i].Length; j++)
+            for (int j = 0; j < grid[i].Count; j++)
             {
                 if (grid[i][j] != null)
                 {
                     spawnDebugSquare(j, i, grid[i][j].pathingWeight);
+
                 }
             }
         }
@@ -338,6 +381,8 @@ public class GridManager : MonoBehaviour
     {
         Vector2 tileCenter = new Vector2(x, y);
         GameObject square = Instantiate(debugSquare, tileCenter, Quaternion.identity);
+        // set parent of square to this
+        square.transform.parent = this.transform;
         debugPool.Add(square);
         SpriteRenderer renderer = square.GetComponent<SpriteRenderer>();
         if (renderer != null)
