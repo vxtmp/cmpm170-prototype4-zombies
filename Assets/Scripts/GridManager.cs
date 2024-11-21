@@ -20,7 +20,8 @@ public class GridManager : MonoBehaviour
     }
 
     public const bool DEBUG_CLICK_FLOWMAP = true; // enables click to generate + show flowmap.
-                                                   // should be false in final build.
+                                                  // should be false in final build.
+                                                  // Note: HIGH OVERHEAD. DO NOT USE IN FINAL BUILD.
     public GameObject wallPrefab;
     public GameObject floorPrefab;
     public GameObject startingPointPrefab;
@@ -38,29 +39,29 @@ public class GridManager : MonoBehaviour
     string gridString =
         "||||||||||||||||||||||\n" +
         "|................|...|\n" +
-        "|................|...|\n" +
-        "|................|...|\n" +
-        "|......||||..||......|\n" +
-        "|.........|......|...|\n" +
-        "|.........|......|...|\n" +
-        "||||......|......|...|\n" +
-        "|.........|......|...|\n" +
+        "|.|..............|...|\n" +
+        "|.|..............|...|\n" +
+        "|.||||.||||..||......|\n" +
+        "|....|....|......|...|\n" +
+        "|....|....|......|...|\n" +
+        "||||.|....|......|...|\n" +
+        "|....|....|......|...|\n" +
         "|....|....|..........|\n" +
-        "|s..................|....|..........|\n" +
+        "|s...|...............|\n" +
         "||||||||||||||||||||||";
 
     public class Cell
     {
         private GameObject terrainObject; // the actual object underneath.
-        public int pathingWeight;
-        public Vector2 position;
+        public float pathingWeight;
+        public Vector2 position; // center of cell in worldspace.
         public Cell(GameObject terrainPrefab,
                     int x, int y)
         {
             this.terrainObject = Instantiate(terrainPrefab, new Vector3(x * TILE_SIZE + TILE_SIZE/2, y * TILE_SIZE + TILE_SIZE/2, 0), Quaternion.identity);
             // initialize pathingValue to max int value
-            this.pathingWeight = int.MaxValue;
-            this.position = new Vector2(x * TILE_SIZE, y * TILE_SIZE);
+            this.pathingWeight = float.MaxValue;
+            this.position = GridManager.Instance.getTileCenterFromIndices(x, y);
         }
         public string getTerrainType()
         {
@@ -179,7 +180,7 @@ public class GridManager : MonoBehaviour
         int y = getTileY(position);
         // iterate over the four adjacent cells if they exist inside the grid
         // return the cell with the lowest pathingWeight
-        int lowestWeight = int.MaxValue;
+        float lowestWeight = float.MaxValue;
         Cell lowestCell = null;
         if (y > 0)
         {
@@ -244,7 +245,7 @@ public class GridManager : MonoBehaviour
         // set pathingWeight of each cell to the distance from x, y
         // initialize all pathingWeights to -1 to indicate unvisited.
 
-        string debugMessage = "Accepted recalcFlowmapWeights at: " + worldSpacePos + "\n";
+        string debugMessage = "DEBUG: recalcFlowmapWeights at: " + worldSpacePos + "\n";
 
         int x = getTileX(worldSpacePos);
         int y = getTileY(worldSpacePos);
@@ -269,35 +270,53 @@ public class GridManager : MonoBehaviour
         while (queue.Count > 0)
         {
             Vector2 current = queue.Dequeue();
-            int distance = grid[(int)current.y][(int)current.x].pathingWeight;
+            float distance = grid[(int)current.y][(int)current.x].pathingWeight;
             debugMessage += "Dequeued: " + current + "\n";
-            //visit all neighbors (up down left right) but not diagonals
+            // visit all neighbors (up down left right) but not diagonals
             foreach (Vector2 neighbor in getNeighbors(current))
             {
                 debugMessage += "Checking neighbor: " + neighbor + "\n";
                 int nx = (int)neighbor.x;
                 int ny = (int)neighbor.y;
 
-                //if (nx >= 0 || nx < grid[ny].Count || ny >= 0 || ny < grid.Count)
-                if (nx < 0 || nx >= grid[ny].Count || ny < 0 || ny >= grid.Count)
+                if (nx < 0 || nx >= grid[ny].Count || ny < 0 || ny >= grid.Count || // array bounds check
+                    grid[ny][nx] == null ||                                         // null check
+                    grid[ny][nx].pathingWeight != -1)                               // visited check
                 {
-                    debugMessage += "failed bounds check at neighbor: " + nx + " " + ny + "\n";
+                    debugMessage += "failed check at neighbor: " + nx + " " + ny + "\n";
                     continue; // neighbor bounds check.
                 }
-
-                if (grid[ny][nx] == null)
-                {
-                    debugMessage += "failed null check at neighbor: " + nx + " " + ny + "\n";
-                    continue; // existing tile check.
-                }
-
-                if (grid[ny][nx].pathingWeight != -1)
-                    continue; // visited check
 
                 debugMessage += "checks passed.\n";
                 if (tileIsEnemyPathable(nx, ny))               // not wall. destructibles should be set to pathable.
                 {
-                    grid[ny][nx].pathingWeight = distance + 1; // set tile distance
+                    grid[ny][nx].pathingWeight = distance + 1.0f; // set tile distance
+                    queue.Enqueue(neighbor);                   // add to queue
+                }
+                else
+                {
+                    grid[ny][nx].pathingWeight = int.MaxValue; // set to max value to indicate impassable
+                }
+            }
+            // visit all diagonal neighbors (incremented by 1.41f (root2))
+            foreach (Vector2 neighbor in getDiagonalNeighbors(current))
+            {
+                debugMessage += "Checking diagonal neighbor: " + neighbor + "\n";
+                int nx = (int)neighbor.x;
+                int ny = (int)neighbor.y;
+
+                if (nx < 0 || nx >= grid[ny].Count || ny < 0 || ny >= grid.Count || // array bounds check
+                    grid[ny][nx] == null ||                                         // null check
+                    grid[ny][nx].pathingWeight != -1)                               // visited check
+                {
+                    debugMessage += "failed check at neighbor: " + nx + " " + ny + "\n";
+                    continue; // neighbor bounds check.
+                }
+
+                debugMessage += "checks passed.\n";
+                if (tileIsEnemyPathable(nx, ny))               // not wall. destructibles should be set to pathable.
+                {
+                    grid[ny][nx].pathingWeight = distance + 1.41f; // set tile distance
                     queue.Enqueue(neighbor);                   // add to queue
                 }
                 else
@@ -330,6 +349,52 @@ public class GridManager : MonoBehaviour
         if (x < grid[y].Count - 1)
         {
             neighbors.Add(new Vector2(x + 1, y));
+        }
+        return neighbors.ToArray();
+    }
+
+    Vector2[] getDiagonalNeighbors (Vector2 position)
+    {
+        int x = getTileX(position);
+        int y = getTileY(position);
+        List<Vector2> neighbors = new List<Vector2>();
+        if (y > 0)
+        {
+            if (x > 0)
+            {
+                // check for path down or left to prevent diagonal leapfrogging
+                if (tileIsEnemyPathable(x - 1, y) || tileIsEnemyPathable(x, y - 1))
+                {
+                    neighbors.Add(new Vector2(x - 1, y - 1)); // add bottom left
+                }
+            }
+            if (x < grid[y].Count - 1)
+            {
+                // check for path down or right to prevent diagonal leapfrogging
+                if (tileIsEnemyPathable(x + 1, y) || tileIsEnemyPathable(x, y - 1))
+                {
+                    neighbors.Add(new Vector2(x + 1, y - 1)); // add bottom right
+                }
+            }
+        }
+        if (y < grid.Count - 1)
+        {
+            if (x > 0)
+            {
+                // check for path up or left to prevent diagonal leapfrogging
+                if (tileIsEnemyPathable(x - 1, y) || tileIsEnemyPathable(x, y + 1))
+                {
+                    neighbors.Add(new Vector2(x - 1, y + 1)); // add top left
+                }
+            }
+            if (x < grid[y].Count - 1)
+            {
+                // check for path up or right to prevent diagonal leapfrogging
+                if (tileIsEnemyPathable(x + 1, y) || tileIsEnemyPathable(x, y + 1))
+                {
+                    neighbors.Add(new Vector2(x + 1, y + 1)); // add top right
+                }
+            }
         }
         return neighbors.ToArray();
     }
@@ -418,9 +483,11 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    public void spawnDebugSquare(int x, int y, int distance)
+    [SerializeField] private float DEBUG_HUE_DEFAULT0POINT7 = 0.7f;
+    [SerializeField] private float DEBUG_DISTANCE_DEFAULT30 = 30f;
+    public void spawnDebugSquare(int x, int y, float distance)
     {
-        Vector2 tileCenter = new Vector2(x, y);
+        Vector2 tileCenter = getTileCenterFromIndices(x, y);
         GameObject square = Instantiate(debugSquare, tileCenter, Quaternion.identity);
         // set parent of square to this
         square.transform.parent = this.transform;
@@ -429,8 +496,12 @@ public class GridManager : MonoBehaviour
         if (renderer != null)
         {
             // Calculate color based on distance
-            float brightness = distance >= 0 && distance < int.MaxValue ? Mathf.Clamp01(1f - (distance / 20f)) : 0;
-            Color color = new Color(brightness, brightness, brightness); // Set color with the same brightness for all channels
+            //float brightness = distance >= 0 && distance < int.MaxValue ? Mathf.Clamp01(1f - (distance / 20f)) : 0;
+            //Color color = new Color(brightness, brightness, brightness); // Set color with the same brightness for all channels
+
+            // Set hue based on distance. If distance is closer, make it more red. If distance is farther, make it more blue.
+            float hue = distance >= 0 && distance < int.MaxValue ? Mathf.Clamp01(DEBUG_HUE_DEFAULT0POINT7 - (distance / DEBUG_DISTANCE_DEFAULT30)) : 0;
+            Color color = Color.HSVToRGB(hue, 1, 1);
 
             // Set the color of the material
             renderer.material.color = color;
@@ -450,8 +521,17 @@ public class GridManager : MonoBehaviour
     {
         return (int)(coords.y / TILE_SIZE);
     }
+
+    public Vector2 getTileCenterFromIndices(int x, int y)
+    {
+        return new Vector2(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2);
+    }
     private bool tileIsEnemyPathable(int x, int y)
     {
+        if (grid[y][x] == null)
+        {
+            return false;
+        }
         if (grid[y][x].getTerrainType() == "Wall" || grid[y][x].getTerrainType() == "Spikes")
         {
             return false;
