@@ -89,8 +89,6 @@ public class GridManager : MonoBehaviour
         return grid[y][x].getTerrainType();
     }
 
-    // make some kind of function to parse a string to spawn a grid.
-
     // Grid             gridString
     // 4                0 1 2 3 4
     // 3                1
@@ -98,7 +96,7 @@ public class GridManager : MonoBehaviour
     // 1                3
     // 0 1 2 3 4        4
 
-    // Grid array aligned to represent unity world space. 
+    // Grid array aligned to represent unity world space (when multiplied by TILE_SIZE) 
     // gridString is read in from top to bottom (due to code)
     public void generateGrid(string gridString)
     {
@@ -239,8 +237,6 @@ public class GridManager : MonoBehaviour
     }
     public void recalcFlowmapWeights(Vector2 worldSpacePos)
     {
-        //debugGridPrint();
-
         // breadth first search of grid starting at origin point x, y
         // set pathingWeight of each cell to the distance from x, y
         // initialize all pathingWeights to -1 to indicate unvisited.
@@ -325,7 +321,6 @@ public class GridManager : MonoBehaviour
                 }
             }
         }
-
         Debug.Log(debugMessage);
     }
 
