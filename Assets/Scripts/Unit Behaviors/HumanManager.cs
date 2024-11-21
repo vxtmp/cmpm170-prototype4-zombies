@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class HumanManager : MonoBehaviour
 {
+    [SerializeField] private GameObject human;
+
+
     // Start is called before the first frame update
     void Start()
     {
