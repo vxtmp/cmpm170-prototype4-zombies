@@ -19,13 +19,16 @@ public class GridManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public const bool DEBUG_CLICK_FLOWMAP = false; // enables click to generate + show flowmap.
+    public const bool DEBUG_CLICK_FLOWMAP = true; // enables click to generate + show flowmap.
                                                    // should be false in final build.
     public GameObject wallPrefab;
     public GameObject floorPrefab;
     public GameObject startingPointPrefab;
 
     private const float TILE_SIZE = 1.0f; // Used by spawnObject() to space out the spawned prefabs.
+                                          // Used by getTileX and getTileY to convert world space to grid space.
+                                          // KEEP THIS AT 1.0f
+                                          // 90% sure it will break something if you change it.
 
     // . = floor
     // | = wall
@@ -69,7 +72,12 @@ public class GridManager : MonoBehaviour
         }
     }
     public List<List<Cell>> grid;
-    public Vector2 startingPoint;
+    private Vector2 startingPoint;
+
+    public Vector2 getStartingPoint()
+    {
+        return startingPoint;
+    }
 
     public float getTileSize()
     {
@@ -228,16 +236,23 @@ public class GridManager : MonoBehaviour
             }
         }
     }
-    public void recalcFlowmapWeights(int x, int y)
+    public void recalcFlowmapWeights(Vector2 worldSpacePos)
     {
+        //debugGridPrint();
+
         // breadth first search of grid starting at origin point x, y
         // set pathingWeight of each cell to the distance from x, y
         // initialize all pathingWeights to -1 to indicate unvisited.
 
-        debugGridPrint();
+        string debugMessage = "Accepted recalcFlowmapWeights at: " + worldSpacePos + "\n";
 
+        int x = getTileX(worldSpacePos);
+        int y = getTileY(worldSpacePos);
+        debugMessage += "Grid Indices: x" + x + " y" + y + "\n";
+
+        // row # (y)
         for (int i = 0; i < grid.Count; i++)
-        {
+        {   // column # (x)
             for (int j = 0; j < grid[i].Count; j++)
             {
                 if (grid[i][j] != null)
@@ -245,7 +260,8 @@ public class GridManager : MonoBehaviour
             }
         }
 
-        // make a queue of cells to visit
+        // make a queue of cells to visit.
+        // Vector2s represent grid indices, not world space.
         Queue<Vector2> queue = new Queue<Vector2>();
         queue.Enqueue(new Vector2(x, y));
         grid[y][x].pathingWeight = 0;
@@ -254,32 +270,31 @@ public class GridManager : MonoBehaviour
         {
             Vector2 current = queue.Dequeue();
             int distance = grid[(int)current.y][(int)current.x].pathingWeight;
-
+            debugMessage += "Dequeued: " + current + "\n";
             //visit all neighbors (up down left right) but not diagonals
-            foreach (Vector2 neighbor in new Vector2[] { new Vector2(current.x, current.y + 1),
-                                                                    new Vector2(current.x, current.y - 1),
-                                                                    new Vector2(current.x + 1, current.y),
-                                                                    new Vector2(current.x - 1, current.y)})
+            foreach (Vector2 neighbor in getNeighbors(current))
             {
+                debugMessage += "Checking neighbor: " + neighbor + "\n";
                 int nx = (int)neighbor.x;
                 int ny = (int)neighbor.y;
 
-                if (nx >= 0 || nx < grid[ny].Count || ny >= 0 || ny < grid.Count)
+                //if (nx >= 0 || nx < grid[ny].Count || ny >= 0 || ny < grid.Count)
+                if (nx < 0 || nx >= grid[ny].Count || ny < 0 || ny >= grid.Count)
                 {
-                    Debug.Log("failed bounds check at neighbor: " + nx + " " + ny);
+                    debugMessage += "failed bounds check at neighbor: " + nx + " " + ny + "\n";
                     continue; // neighbor bounds check.
                 }
 
                 if (grid[ny][nx] == null)
                 {
-                    Debug.Log("failed null check at neighbor: " + nx + " " + ny);
+                    debugMessage += "failed null check at neighbor: " + nx + " " + ny + "\n";
                     continue; // existing tile check.
                 }
 
                 if (grid[ny][nx].pathingWeight != -1)
                     continue; // visited check
 
-                Debug.Log("checks passed");
+                debugMessage += "checks passed.\n";
                 if (tileIsEnemyPathable(nx, ny))               // not wall. destructibles should be set to pathable.
                 {
                     grid[ny][nx].pathingWeight = distance + 1; // set tile distance
@@ -292,6 +307,31 @@ public class GridManager : MonoBehaviour
             }
         }
 
+        Debug.Log(debugMessage);
+    }
+
+    Vector2[] getNeighbors (Vector2 position)
+    {
+        int x = getTileX(position);
+        int y = getTileY(position);
+        List<Vector2> neighbors = new List<Vector2>();
+        if (y > 0)
+        {
+            neighbors.Add(new Vector2(x, y - 1));
+        }
+        if (y < grid.Count - 1)
+        {
+            neighbors.Add(new Vector2(x, y + 1));
+        }
+        if (x > 0)
+        {
+            neighbors.Add(new Vector2(x - 1, y));
+        }
+        if (x < grid[y].Count - 1)
+        {
+            neighbors.Add(new Vector2(x + 1, y));
+        }
+        return neighbors.ToArray();
     }
 
     // Start is called before the first frame update
@@ -319,7 +359,7 @@ public class GridManager : MonoBehaviour
     public Vector2 getMouseCoords()
     {
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        return new Vector2(Mathf.Floor(mousePos.x), Mathf.Floor(mousePos.y));
+        return mousePos;
     }
 
     // mouseclick event handler
@@ -328,18 +368,19 @@ public class GridManager : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 coords = getMouseCoords();
-            int tileX = getTileX(coords);
-            int tileY = getTileY(coords);
-            if (isValidOrigin(tileX, tileY))
+            if (isValidOrigin(coords))
             {
-                recalcFlowmapWeights(tileX, tileY);
-                spawnDebugSquares(tileX, tileY);
+                recalcFlowmapWeights(coords);
+                spawnDebugSquares();
             }
         }
     }
 
-    public bool isValidOrigin(int x, int y)
+    public bool isValidOrigin(Vector2 worldSpacePos)
     {
+        int x = getTileX(worldSpacePos);
+        int y = getTileY(worldSpacePos);
+
         // if the coordinate is within the grid, and is not null, wall, or spike, return true;
         if (y >= 0 && y < grid.Count)
         {
@@ -357,7 +398,7 @@ public class GridManager : MonoBehaviour
         return false;
     }
 
-    public void spawnDebugSquares(int x, int y)
+    public void spawnDebugSquares()
     {
         foreach (GameObject square in debugPool)
         {
