@@ -40,7 +40,7 @@ public class ZombieScript : MonoBehaviour
         else
         {
             // move to getLowestNeighbor
-            Vector2 dest = GridManager.Instance.getDestinationNeighbor(this.transform.position);
+            Vector2 dest = GridManager.Instance.getLowestNeighbor(this.transform.position);
             Vector3 direction = dest - (Vector2)this.transform.position;
             direction.Normalize();
             moveSelf(direction);

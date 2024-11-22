@@ -19,9 +19,11 @@ public class GridManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public const bool DEBUG_CLICK_FLOWMAP = false; // enables click to generate + show flowmap.
-                                                  // should be false in final build.
-                                                  // Note: HIGH OVERHEAD. DO NOT USE IN FINAL BUILD.
+    [SerializeField] private bool DEBUG_CLICK_FLOWMAP = false; // enables click to generate + show flowmap.
+                                                   // should be false in final build.
+                                                   // Note: HIGH OVERHEAD. DO NOT USE IN FINAL BUILD.
+    [SerializeField] private bool DEBUG_FLOW_VOLUME = false;
+
     public GameObject wallPrefab;
     public GameObject floorPrefab;
     public GameObject startingPointPrefab;
@@ -30,6 +32,8 @@ public class GridManager : MonoBehaviour
                                           // Used by getTileX and getTileY to convert world space to grid space.
                                           // KEEP THIS AT 1.0f
                                           // 90% sure it will break something if you change it.
+
+    private const float PATHING_VOLUME_CUTOFF = .5f; // volume cutoff for sound-based pathing.
 
     // . = floor
     // | = wall
@@ -53,14 +57,20 @@ public class GridManager : MonoBehaviour
     public class Cell
     {
         private GameObject terrainObject; // the actual object underneath.
-        public float pathingWeight;
+        public float pathingWeight; // calc by distance by default recalcFlowmapWeights() function.
+        public float distanceFromOrigin; // distance again, but used for volume function to avoid influencing
+                                         // the pathingWeight.      
+        public float pathingVolume;
+        public bool visitedByCurrentBSF;
         public Vector2 position; // center of cell in worldspace.
         public Cell(GameObject terrainPrefab,
                     int x, int y)
         {
-            this.terrainObject = Instantiate(terrainPrefab, new Vector3(x * TILE_SIZE + TILE_SIZE/2, y * TILE_SIZE + TILE_SIZE/2, 0), Quaternion.identity);
+            this.terrainObject = Instantiate(terrainPrefab, new Vector3(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 0), Quaternion.identity);
             // initialize pathingValue to max int value
             this.pathingWeight = float.MaxValue;
+            this.pathingVolume = 0.0f;
+            this.visitedByCurrentBSF = false;
             this.position = GridManager.Instance.getTileCenterFromIndices(x, y);
         }
         public string getTerrainType()
@@ -75,19 +85,6 @@ public class GridManager : MonoBehaviour
     public List<List<Cell>> grid;
     private Vector2 startingPoint;
 
-    public Vector2 getStartingPoint()
-    {
-        return startingPoint;
-    }
-
-    public float getTileSize()
-    {
-        return TILE_SIZE;
-    }
-    public string getCellType(int x, int y)
-    {
-        return grid[y][x].getTerrainType();
-    }
 
     // Grid             gridString
     // 4                0 1 2 3 4
@@ -126,8 +123,8 @@ public class GridManager : MonoBehaviour
                                               j, i);
                         // put the player at the starting point
                         GameManager.Instance.getPlayer().transform.position = new Vector3(
-                            j * TILE_SIZE + TILE_SIZE/2, 
-                            i * TILE_SIZE + TILE_SIZE/2, 
+                            j * TILE_SIZE + TILE_SIZE / 2,
+                            i * TILE_SIZE + TILE_SIZE / 2,
                             0);
                         startingPoint = new Vector2(j * TILE_SIZE, i * TILE_SIZE);
                         break;
@@ -144,44 +141,16 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    public void debugGridPrint()
-    {
-        string gridString = "Grid:\n";
-        // print a formatted 2d string according to grid
-        for (int i = 0; i < grid.Count; i++)
-        {
-            string row = "" + i + ":";
-            for (int spaces = 0; spaces < 2 - i.ToString().Length; spaces++)
-            {
-                row += " ";
-            }
-            for (int j = 0; j < grid[i].Count; j++)
-            {
-                if (grid[i][j] != null)
-                {
-                    char terrainTypeAbbreviated = grid[i][j].getTerrainType()[0];
-                    row += terrainTypeAbbreviated;
-                }
-                else
-                {
-                    row += " ";
-                }
-            }
-            gridString += row + "\n";
-        }
-        Debug.Log(gridString);
-    }
-
-    public Vector2 getDestinationNeighbor (Vector2 position)
+    public Vector2 getDestinationNeighbor(Vector2 position)
     {
         return getLowestNeighbor(position);
     }
 
-    public Vector2 getHighestNeighbor (Vector2 position)
+    public Vector2 getLoudestNeighbor(Vector2 position)
     {
         int x = getTileX(position);
         int y = getTileY(position);
-        float highestWeight = float.MinValue;
+        float highestVolume = float.MinValue;
         Cell highestCell = null;
         Vector2[] allNeighbors = combineArray(getNeighbors(position), getDiagonalNeighbors(position));
 
@@ -189,22 +158,13 @@ public class GridManager : MonoBehaviour
         {
             int nx = (int)neighbor.x;
             int ny = (int)neighbor.y;
-            if (grid[ny][nx].pathingWeight > highestWeight)
+            if (grid[ny][nx].pathingVolume > highestVolume)
             {
-                highestWeight = grid[ny][nx].pathingWeight;
+                highestVolume = grid[ny][nx].pathingVolume;
                 highestCell = grid[ny][nx];
             }
         }
         return highestCell.position;
-    }
-
-
-    public Vector2[] combineArray(Vector2[] a1, Vector2[] a2)
-    {
-        Vector2[] combined = new Vector2[a1.Length + a2.Length];
-        a1.CopyTo(combined, 0);
-        a2.CopyTo(combined, a1.Length);
-        return combined;
     }
     public Vector2 getLowestNeighbor(Vector2 position)
     {
@@ -230,12 +190,6 @@ public class GridManager : MonoBehaviour
         return lowestCell.position;
     }
 
-    public Vector2 getTile(Vector2 coords)
-    {
-        return new Vector2(getTileX(coords), getTileY(coords));
-    }
-
-
     public void initializeFlowmapWeights()
     {
         for (int i = 0; i < grid.Count; i++)
@@ -243,6 +197,7 @@ public class GridManager : MonoBehaviour
             for (int j = 0; j < grid[i].Count; j++)
             {
                 grid[i][j].pathingWeight = -1;
+                grid[i][j].pathingVolume = 0.0f;
                 if (getCellType(j, i) == "Wall" || getCellType(j, i) == "Spikes")
                 {
                     grid[i][j].pathingWeight = int.MaxValue;
@@ -255,22 +210,14 @@ public class GridManager : MonoBehaviour
         // breadth first search of grid starting at origin point x, y
         // set pathingWeight of each cell to the distance from x, y
         // initialize all pathingWeights to -1 to indicate unvisited.
-
-        string debugMessage = "DEBUG: recalcFlowmapWeights at: " + worldSpacePos + "\n";
+        string debugMessage = "DEBUG: recalcFlowmapAdditive at: " + worldSpacePos + "\n";
 
         int x = getTileX(worldSpacePos);
         int y = getTileY(worldSpacePos);
         debugMessage += "Grid Indices: x" + x + " y" + y + "\n";
 
-        // row # (y)
-        for (int i = 0; i < grid.Count; i++)
-        {   // column # (x)
-            for (int j = 0; j < grid[i].Count; j++)
-            {
-                if (grid[i][j] != null)
-                    grid[i][j].pathingWeight = -1;
-            }
-        }
+        // O(n). Reset all visited flags in grid.
+        resetVisited();
 
         // make a queue of cells to visit.
         // Vector2s represent grid indices, not world space.
@@ -290,15 +237,14 @@ public class GridManager : MonoBehaviour
                 int nx = (int)neighbor.x;
                 int ny = (int)neighbor.y;
 
-                if (nx < 0 || nx >= grid[ny].Count || ny < 0 || ny >= grid.Count || // array bounds check
-                    grid[ny][nx] == null ||                                         // null check
-                    grid[ny][nx].pathingWeight != -1)                               // visited check
+                if (isInvalidPath(nx, ny))
                 {
                     debugMessage += "failed check at neighbor: " + nx + " " + ny + "\n";
                     continue; // neighbor bounds check.
                 }
-
+                grid[ny][nx].visitedByCurrentBSF = true;
                 debugMessage += "checks passed.\n";
+
                 if (tileIsEnemyPathable(nx, ny))               // not wall. destructibles should be set to pathable.
                 {
                     grid[ny][nx].pathingWeight = distance + 1.0f; // set tile distance
@@ -316,13 +262,12 @@ public class GridManager : MonoBehaviour
                 int nx = (int)neighbor.x;
                 int ny = (int)neighbor.y;
 
-                if (nx < 0 || nx >= grid[ny].Count || ny < 0 || ny >= grid.Count || // array bounds check
-                    grid[ny][nx] == null ||                                         // null check
-                    grid[ny][nx].pathingWeight != -1)                               // visited check
+                if (isInvalidPath(nx, ny))
                 {
                     debugMessage += "failed check at neighbor: " + nx + " " + ny + "\n";
                     continue; // neighbor bounds check.
                 }
+                grid[ny][nx].visitedByCurrentBSF = true;
 
                 debugMessage += "checks passed.\n";
                 if (tileIsEnemyPathable(nx, ny))               // not wall. destructibles should be set to pathable.
@@ -339,74 +284,125 @@ public class GridManager : MonoBehaviour
         Debug.Log(debugMessage);
     }
 
-    Vector2[] getNeighbors (Vector2 position)
+    private void resetDebugPool()
     {
-        int x = getTileX(position);
-        int y = getTileY(position);
-        List<Vector2> neighbors = new List<Vector2>();
-        if (y > 0)
+        if (debugPool != null)
         {
-            neighbors.Add(new Vector2(x, y - 1));
+            foreach (GameObject square in debugPool)
+            {
+                Destroy(square);
+            }
         }
-        if (y < grid.Count - 1)
+        else
         {
-            neighbors.Add(new Vector2(x, y + 1));
+            debugPool = new List<GameObject>();
         }
-        if (x > 0)
-        {
-            neighbors.Add(new Vector2(x - 1, y));
-        }
-        if (x < grid[y].Count - 1)
-        {
-            neighbors.Add(new Vector2(x + 1, y));
-        }
-        return neighbors.ToArray();
     }
 
-    Vector2[] getDiagonalNeighbors (Vector2 position)
+    public void recalcFlowmapVolume(Vector2 worldSpacePos, float originVolume)
     {
-        int x = getTileX(position);
-        int y = getTileY(position);
-        List<Vector2> neighbors = new List<Vector2>();
-        if (y > 0)
+        // breadth first search of grid starting at origin point x, y
+        // set pathingWeight of each cell to the distance from x, y
+        // initialize all pathingWeights to -1 to indicate unvisited.
+        string debugMessage = "DEBUG: recalcFlowmapReductive at: " + worldSpacePos + "\n";
+
+        int x = getTileX(worldSpacePos);
+        int y = getTileY(worldSpacePos);
+        debugMessage += "Grid Indices: x" + x + " y" + y + "\n";
+
+        if (DEBUG_FLOW_VOLUME)
         {
-            if (x > 0)
+            resetDebugPool();
+        }
+
+        // O(n). Reset all visited flags in grid.
+        resetVisited();
+
+        // make a queue of cells to visit.
+        // Vector2s represent grid indices, not world space.
+        Queue<Vector2> queue = new Queue<Vector2>();
+        queue.Enqueue(new Vector2(x, y));
+        grid[y][x].distanceFromOrigin = 0;
+
+        while (queue.Count > 0)
+        {
+            Vector2 current = queue.Dequeue();
+            float distance = grid[(int)current.y][(int)current.x].distanceFromOrigin;
+            debugMessage += "Dequeued: " + current + "\n";
+            // visit all neighbors (up down left right) but not diagonals
+            foreach (Vector2 neighbor in getNeighbors(current))
             {
-                // check for path down or left to prevent diagonal leapfrogging
-                if (tileIsEnemyPathable(x - 1, y) || tileIsEnemyPathable(x, y - 1))
+                debugMessage += "Checking neighbor: " + neighbor + "\n";
+                int nx = (int)neighbor.x;
+                int ny = (int)neighbor.y;
+
+                if (isInvalidPath(nx, ny))
                 {
-                    neighbors.Add(new Vector2(x - 1, y - 1)); // add bottom left
+                    debugMessage += "failed check at neighbor: " + nx + " " + ny + "\n";
+                    continue; // neighbor bounds check.
+                }
+                grid[ny][nx].visitedByCurrentBSF = true;
+
+                debugMessage += "checks passed.\n";
+                if (tileIsEnemyPathable(nx, ny))               // not wall. destructibles should be set to pathable.
+                {
+                    grid[ny][nx].distanceFromOrigin = distance + 1.0f; // set tile distance
+                    float currentSoundVolume = originVolume / ((distance + 1.0f) *
+                                                                  (distance + 1.0f));
+                    if (currentSoundVolume > PATHING_VOLUME_CUTOFF)
+                    {
+                        grid[ny][nx].pathingVolume += currentSoundVolume;
+                        queue.Enqueue(neighbor);                   // add to queue
+                    }
+                }
+                else
+                {
+                    grid[ny][nx].pathingVolume = 0.0f;
+                    grid[ny][nx].distanceFromOrigin = float.MaxValue; // set to max value to indicate impassable
+                }
+                if (DEBUG_FLOW_VOLUME)
+                {
+                    spawnDebugSquare(nx, ny, grid[ny][nx].pathingVolume);
                 }
             }
-            if (x < grid[y].Count - 1)
+            // visit all diagonal neighbors (incremented by 1.41f (root2))
+            foreach (Vector2 neighbor in getDiagonalNeighbors(current))
             {
-                // check for path down or right to prevent diagonal leapfrogging
-                if (tileIsEnemyPathable(x + 1, y) || tileIsEnemyPathable(x, y - 1))
+                debugMessage += "Checking diagonal neighbor: " + neighbor + "\n";
+                int nx = (int)neighbor.x;
+                int ny = (int)neighbor.y;
+
+                if (isInvalidPath(nx, ny))
                 {
-                    neighbors.Add(new Vector2(x + 1, y - 1)); // add bottom right
+                    debugMessage += "failed check at neighbor: " + nx + " " + ny + "\n";
+                    continue; // neighbor bounds check.
+                }
+
+                debugMessage += "checks passed.\n";
+                if (tileIsEnemyPathable(nx, ny))               // not wall. destructibles should be set to pathable.
+                {
+                    grid[ny][nx].distanceFromOrigin = distance + 1.41f;       // set tile distance
+                    float currentSoundVolume = originVolume / ((distance + 1.41f) *
+                                                                  (distance + 1.41f));
+                    if (currentSoundVolume > PATHING_VOLUME_CUTOFF)
+                    {
+                        grid[ny][nx].visitedByCurrentBSF = true;
+                        grid[ny][nx].pathingVolume += currentSoundVolume;
+                        queue.Enqueue(neighbor);                   // add to queue
+                    }
+                }
+                else
+                {
+                    grid[ny][nx].visitedByCurrentBSF = true;
+                    grid[ny][nx].distanceFromOrigin = float.MaxValue; // set to max value to indicate impassable
+                }
+                if (DEBUG_FLOW_VOLUME)
+                {
+                    spawnDebugSquare(nx, ny, grid[ny][nx].pathingVolume);
                 }
             }
         }
-        if (y < grid.Count - 1)
-        {
-            if (x > 0)
-            {
-                // check for path up or left to prevent diagonal leapfrogging
-                if (tileIsEnemyPathable(x - 1, y) || tileIsEnemyPathable(x, y + 1))
-                {
-                    neighbors.Add(new Vector2(x - 1, y + 1)); // add top left
-                }
-            }
-            if (x < grid[y].Count - 1)
-            {
-                // check for path up or right to prevent diagonal leapfrogging
-                if (tileIsEnemyPathable(x + 1, y) || tileIsEnemyPathable(x, y + 1))
-                {
-                    neighbors.Add(new Vector2(x + 1, y + 1)); // add top right
-                }
-            }
-        }
-        return neighbors.ToArray();
+        Debug.Log(debugMessage);
     }
 
     // Start is called before the first frame update
@@ -414,7 +410,8 @@ public class GridManager : MonoBehaviour
     {
         generateGrid(gridString);
         initializeFlowmapWeights();
-        debugPool = new List<GameObject>();
+        if (DEBUG_CLICK_FLOWMAP)
+            debugPool = new List<GameObject>();
     }
 
     // Update is called once per frame
@@ -449,28 +446,6 @@ public class GridManager : MonoBehaviour
                 spawnDebugSquares();
             }
         }
-    }
-
-    public bool isValidOrigin(Vector2 worldSpacePos)
-    {
-        int x = getTileX(worldSpacePos);
-        int y = getTileY(worldSpacePos);
-
-        // if the coordinate is within the grid, and is not null, wall, or spike, return true;
-        if (y >= 0 && y < grid.Count)
-        {
-            if (x >= 0 && x < grid[y].Count)
-            {
-                if (grid[y][x] != null)
-                {
-                    if (grid[y][x].getTerrainType() != "Wall" && grid[y][x].getTerrainType() != "Spikes")
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     public void spawnDebugSquares()
@@ -518,11 +493,101 @@ public class GridManager : MonoBehaviour
         }
     }
 
+    public void debugGridPrint()
+    {
+        string gridString = "Grid:\n";
+        // print a formatted 2d string according to grid
+        for (int i = 0; i < grid.Count; i++)
+        {
+            string row = "" + i + ":";
+            for (int spaces = 0; spaces < 2 - i.ToString().Length; spaces++)
+            {
+                row += " ";
+            }
+            for (int j = 0; j < grid[i].Count; j++)
+            {
+                if (grid[i][j] != null)
+                {
+                    char terrainTypeAbbreviated = grid[i][j].getTerrainType()[0];
+                    row += terrainTypeAbbreviated;
+                }
+                else
+                {
+                    row += " ";
+                }
+            }
+            gridString += row + "\n";
+        }
+        Debug.Log(gridString);
+    }
+
+    // Make a DebugVolume() function that will perform a BSF on a given position
+    // and copy the logic from spawnDebugSquare except it will grab the pathingVolume
+    // instead of the pathingWeight.
+    private void DebugVolume(Vector2 position)
+    {
+
+    }
+
     // ------------------------------------
     // Helper functions
     // ------------------------------------
 
+    private void resetVisited()
+    {
+        // row # (y)
+        for (int i = 0; i < grid.Count; i++)
+        {   // column # (x)
+            for (int j = 0; j < grid[i].Count; j++)
+            {
+                if (grid[i][j] != null)
+                {
+                    grid[i][j].visitedByCurrentBSF = false;
+                    grid[i][j].distanceFromOrigin = float.MaxValue;
+                }
+            }
+        }
+    }
 
+    private bool isInvalidPath(int nx, int ny)
+    {
+        if (nx < 0 || nx >= grid[ny].Count || ny < 0 || ny >= grid.Count || // array bounds check
+            grid[ny][nx] == null ||                                         // null check
+            grid[ny][nx].visitedByCurrentBSF == true)                       // visited check
+        {
+            return true;
+        }
+        return false;
+    }
+    public bool isValidOrigin(Vector2 worldSpacePos)
+    {
+        int x = getTileX(worldSpacePos);
+        int y = getTileY(worldSpacePos);
+
+        // if the coordinate is within the grid, and is not null, wall, or spike, return true;
+        if (y >= 0 && y < grid.Count)
+        {
+            if (x >= 0 && x < grid[y].Count)
+            {
+                if (grid[y][x] != null)
+                {
+                    if (grid[y][x].getTerrainType() != "Wall" && grid[y][x].getTerrainType() != "Spikes")
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public Vector2[] combineArray(Vector2[] a1, Vector2[] a2)
+    {
+        Vector2[] combined = new Vector2[a1.Length + a2.Length];
+        a1.CopyTo(combined, 0);
+        a2.CopyTo(combined, a1.Length);
+        return combined;
+    }
     public int getTileX(Vector2 coords)
     {
         return (int)(coords.x / TILE_SIZE);
@@ -548,4 +613,91 @@ public class GridManager : MonoBehaviour
         }
         return true;
     }
+    public Vector2 getStartingPoint()
+    {
+        return startingPoint;
+    }
+
+    public float getTileSize()
+    {
+        return TILE_SIZE;
+    }
+    public string getCellType(int x, int y)
+    {
+        return grid[y][x].getTerrainType();
+    }
+
+    public Vector2 getTile(Vector2 coords)
+    {
+        return new Vector2(getTileX(coords), getTileY(coords));
+    }
+    Vector2[] getNeighbors(Vector2 position)
+    {
+        int x = getTileX(position);
+        int y = getTileY(position);
+        List<Vector2> neighbors = new List<Vector2>();
+        if (y > 0)
+        {
+            neighbors.Add(new Vector2(x, y - 1));
+        }
+        if (y < grid.Count - 1)
+        {
+            neighbors.Add(new Vector2(x, y + 1));
+        }
+        if (x > 0)
+        {
+            neighbors.Add(new Vector2(x - 1, y));
+        }
+        if (x < grid[y].Count - 1)
+        {
+            neighbors.Add(new Vector2(x + 1, y));
+        }
+        return neighbors.ToArray();
+    }
+    Vector2[] getDiagonalNeighbors(Vector2 position)
+    {
+        int x = getTileX(position);
+        int y = getTileY(position);
+        List<Vector2> neighbors = new List<Vector2>();
+        if (y > 0)
+        {
+            if (x > 0)
+            {
+                // check for path down or left to prevent diagonal leapfrogging
+                if (tileIsEnemyPathable(x - 1, y) || tileIsEnemyPathable(x, y - 1))
+                {
+                    neighbors.Add(new Vector2(x - 1, y - 1)); // add bottom left
+                }
+            }
+            if (x < grid[y].Count - 1)
+            {
+                // check for path down or right to prevent diagonal leapfrogging
+                if (tileIsEnemyPathable(x + 1, y) || tileIsEnemyPathable(x, y - 1))
+                {
+                    neighbors.Add(new Vector2(x + 1, y - 1)); // add bottom right
+                }
+            }
+        }
+        if (y < grid.Count - 1)
+        {
+            if (x > 0)
+            {
+                // check for path up or left to prevent diagonal leapfrogging
+                if (tileIsEnemyPathable(x - 1, y) || tileIsEnemyPathable(x, y + 1))
+                {
+                    neighbors.Add(new Vector2(x - 1, y + 1)); // add top left
+                }
+            }
+            if (x < grid[y].Count - 1)
+            {
+                // check for path up or right to prevent diagonal leapfrogging
+                if (tileIsEnemyPathable(x + 1, y) || tileIsEnemyPathable(x, y + 1))
+                {
+                    neighbors.Add(new Vector2(x + 1, y + 1)); // add top right
+                }
+            }
+        }
+        return neighbors.ToArray();
+    }
+
 }

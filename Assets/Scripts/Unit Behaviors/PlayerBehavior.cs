@@ -24,7 +24,7 @@ public class PlayerBehavior : MonoBehaviour
         else
         {
             global_aggro_timer = 0.0f;
-            GridManager.Instance.recalcFlowmapWeights(this.transform.position);
+            GridManager.Instance.recalcFlowmapVolume(this.transform.position, 5.0f);
         }
         // move
         parseWASD();
