@@ -648,6 +648,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6378268931537905457, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8927084352962186645, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
       propertyPath: m_Name
       value: Zombie
