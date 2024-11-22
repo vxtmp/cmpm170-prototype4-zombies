@@ -8,20 +8,23 @@ public class ZombieScript : MonoBehaviour
     [SerializeField] private GameObject zombieAcqRangeObj;
     private ZombieAcquisitionRange acquisitionRange;
 
+    Rigidbody2D rb;
+
     public int health = 5;
     [SerializeField] private int damage = 2;
 
 
-    private const bool PHYSICS_BASED = false;               // Switch between physics-based move / not.
+    // Inspector Constants.
+    private bool PHYSICS_BASED = true; // Switch between physics-based move / not.
+    private float PHYSICS_BASE_SPEED = 100.0f;
+    private float PHYSICS_MAX_SPEED = 100.0f;
+    private float NOT_PHYSICS_BASE_SPEED = 100.0f;
+    private float SPEED_MULTIPLIER = 50.0f;
 
-    private List<GameObject> nearbyTargets;
-    private readonly string[] TARGET_TAGS = {   "Human",    // Targets that zombies will move towards and attack, when 
-                                            "Player",       // within a minimum range as defined by trigger volume radius.
-                                            "Gate" };
 
     void Start()                                            // Start
     {
-        nearbyTargets = new List<GameObject>();
+        rb = this.GetComponent<Rigidbody2D>();
         acquisitionRange = zombieAcqRangeObj.GetComponent<ZombieAcquisitionRange>();
     }
 
@@ -29,7 +32,7 @@ public class ZombieScript : MonoBehaviour
     void Update()                                           // Update
     {
         // if there is nearby target, move towards closest
-        if (nearbyTargets.Count > 0)
+        if (acquisitionRange.getTargetsInRange().Count > 0)
         {
             moveSelf(directionToNearestHuman());
         }
@@ -42,48 +45,20 @@ public class ZombieScript : MonoBehaviour
     }
 
 
-    // Performance optimization: move trigger volumes to empty child object
-    // on different layer that only collides with targets to avoid collision
-    // overhead; while allowing zombies to still have collision with each
-    // other
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (isATarget(collision.gameObject))
-        {
-            // insert to list of nearby humans
-            nearbyTargets.Add(collision.gameObject);
-        }
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (isATarget(collision.gameObject))
-        {
-            // remove from list of nearby humans
-            nearbyTargets.Remove(collision.gameObject);
-        }
-    }
-
-    private bool isATarget(GameObject target)
-    {
-        foreach (string targetTag in TARGET_TAGS)
-        {
-            if (target.tag == targetTag)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void moveSelf(Vector3 direction)
     {
         if (PHYSICS_BASED)
         {
-            // WIP
+            rb.AddForce(direction * Time.deltaTime * PHYSICS_BASE_SPEED * SPEED_MULTIPLIER);
+            // Clamp velocity to max speed
+            if (rb.velocity.magnitude > PHYSICS_MAX_SPEED)
+            {
+                rb.velocity = rb.velocity.normalized * PHYSICS_MAX_SPEED;
+            }
         }
         else
         {
-            this.transform.position += direction * Time.deltaTime;
+            this.transform.position += direction * Time.deltaTime * NOT_PHYSICS_BASE_SPEED;
         }
     }
 
@@ -91,9 +66,9 @@ public class ZombieScript : MonoBehaviour
     private Vector3 directionToNearestHuman()
     {
         // find the closest human
-        GameObject closestHuman = nearbyTargets[0];
+        GameObject closestHuman = acquisitionRange.getTargetsInRange()[0];
         float closestDistance = Vector3.Distance(this.transform.position, closestHuman.transform.position);
-        foreach (GameObject human in nearbyTargets)
+        foreach (GameObject human in acquisitionRange.getTargetsInRange())
         {
             float distance = Vector3.Distance(this.transform.position, human.transform.position);
             if (distance < closestDistance)

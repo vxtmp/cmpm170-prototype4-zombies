@@ -19,7 +19,7 @@ public class GridManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public const bool DEBUG_CLICK_FLOWMAP = true; // enables click to generate + show flowmap.
+    public const bool DEBUG_CLICK_FLOWMAP = false; // enables click to generate + show flowmap.
                                                   // should be false in final build.
                                                   // Note: HIGH OVERHEAD. DO NOT USE IN FINAL BUILD.
     public GameObject wallPrefab;

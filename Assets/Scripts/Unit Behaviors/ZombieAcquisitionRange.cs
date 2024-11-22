@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ZombieAcquisitionRange : MonoBehaviour
 {
-    List<GameObject> targetsInRange = new List<GameObject>();
+    public List<GameObject> targetsInRange = new List<GameObject>();
 
     public List<GameObject> getTargetsInRange()
     {
