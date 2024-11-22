@@ -18,6 +18,10 @@ public class GridManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
+    [SerializeField] private bool NOTE_ = false;
+    [SerializeField] private bool KEEP_ = false;
+    [SerializeField] private bool DEFAULT_ = false;
+    [SerializeField] private bool VALUES_ = false;
 
     [SerializeField] private bool DEBUG_CLICK_FLOWMAP = false; // enables click to generate + show flowmap.
                                                    // should be false in final build.
@@ -33,7 +37,9 @@ public class GridManager : MonoBehaviour
                                           // KEEP THIS AT 1.0f
                                           // 90% sure it will break something if you change it.
 
-    private const float PATHING_VOLUME_CUTOFF = .5f; // volume cutoff for sound-based pathing.
+    [SerializeField] private bool USE_SOUND_PATHING = false;
+    [SerializeField] private float PATHING_VOLUME_CUTOFF = .5f; // volume cutoff for sound-based pathing.
+    [SerializeField] private float VOLUME_FALLOFF = 0.1f; // volume falloff for sound-based pathing.
 
     // . = floor
     // | = wall
@@ -95,7 +101,7 @@ public class GridManager : MonoBehaviour
 
     // Grid array aligned to represent unity world space (when multiplied by TILE_SIZE) 
     // gridString is read in from top to bottom (due to code)
-    public void generateGrid(string gridString)
+    private void generateGrid(string gridString)
     {
         string[] rows = gridString.Split('\n');
         grid = new List<List<Cell>>();
@@ -143,10 +149,19 @@ public class GridManager : MonoBehaviour
 
     public Vector2 getDestinationNeighbor(Vector2 position)
     {
-        return getLowestNeighbor(position);
+        if (USE_SOUND_PATHING)
+            return getLoudestNeighbor(position);
+        else
+            return getLowestNeighbor(position);
     }
-
-    public Vector2 getLoudestNeighbor(Vector2 position)
+    public void recalcPathing(Vector2 worldSpacePos, float volume = 50.0f)
+    {
+        if (USE_SOUND_PATHING)
+            recalcFlowmapVolume(worldSpacePos, volume);
+        else
+            recalcFlowmapWeights(worldSpacePos);
+    }
+    private Vector2 getLoudestNeighbor(Vector2 position)
     {
         int x = getTileX(position);
         int y = getTileY(position);
@@ -166,7 +181,7 @@ public class GridManager : MonoBehaviour
         }
         return highestCell.position;
     }
-    public Vector2 getLowestNeighbor(Vector2 position)
+    private Vector2 getLowestNeighbor(Vector2 position)
     {
         int x = getTileX(position);
         int y = getTileY(position);
@@ -190,7 +205,7 @@ public class GridManager : MonoBehaviour
         return lowestCell.position;
     }
 
-    public void initializeFlowmapWeights()
+    private void initializeFlowmapWeights()
     {
         for (int i = 0; i < grid.Count; i++)
         {
@@ -205,7 +220,8 @@ public class GridManager : MonoBehaviour
             }
         }
     }
-    public void recalcFlowmapWeights(Vector2 worldSpacePos)
+
+    private void recalcFlowmapWeights(Vector2 worldSpacePos)
     {
         // breadth first search of grid starting at origin point x, y
         // set pathingWeight of each cell to the distance from x, y
@@ -299,7 +315,7 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    public void recalcFlowmapVolume(Vector2 worldSpacePos, float originVolume)
+    private void recalcFlowmapVolume(Vector2 worldSpacePos, float originVolume)
     {
         // breadth first search of grid starting at origin point x, y
         // set pathingWeight of each cell to the distance from x, y
@@ -322,7 +338,7 @@ public class GridManager : MonoBehaviour
         // Vector2s represent grid indices, not world space.
         Queue<Vector2> queue = new Queue<Vector2>();
         queue.Enqueue(new Vector2(x, y));
-        grid[y][x].distanceFromOrigin = 0;
+        grid[y][x].distanceFromOrigin = 0.1f;
 
         while (queue.Count > 0)
         {
@@ -544,6 +560,7 @@ public class GridManager : MonoBehaviour
                 {
                     grid[i][j].visitedByCurrentBSF = false;
                     grid[i][j].distanceFromOrigin = float.MaxValue;
+                    grid[i][j].pathingVolume *= VOLUME_FALLOFF;
                 }
             }
         }
