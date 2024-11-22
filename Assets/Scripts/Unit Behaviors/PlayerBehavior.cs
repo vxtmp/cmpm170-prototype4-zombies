@@ -5,6 +5,9 @@ using UnityEngine;
 public class PlayerBehavior : MonoBehaviour
 {
     public const float PLAYER_SPEED = 5.0f;
+
+    public float GLOBAL_AGGRO_INTERVAL = 5.0f;
+    private float global_aggro_timer = 0.0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,6 +17,15 @@ public class PlayerBehavior : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (global_aggro_timer < GLOBAL_AGGRO_INTERVAL)
+        {
+            global_aggro_timer += Time.deltaTime;
+        }
+        else
+        {
+            global_aggro_timer = 0.0f;
+            GridManager.Instance.recalcFlowmapWeights(this.transform.position);
+        }
         // move
         parseWASD();
     }
