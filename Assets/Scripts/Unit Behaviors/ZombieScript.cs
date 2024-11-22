@@ -16,10 +16,10 @@ public class ZombieScript : MonoBehaviour
 
     // Inspector Constants.
     private bool PHYSICS_BASED = true; // Switch between physics-based move / not.
-    private float PHYSICS_BASE_SPEED = 100.0f;
-    private float PHYSICS_MAX_SPEED = 100.0f;
-    private float NOT_PHYSICS_BASE_SPEED = 100.0f;
-    private float SPEED_MULTIPLIER = 50.0f;
+    private float PHYSICS_BASE_SPEED = 50.0f;
+    private float PHYSICS_MAX_SPEED = 10.0f;
+    private float NOT_PHYSICS_BASE_SPEED = 50.0f;
+    private float SPEED_MULTIPLIER = 1.0f;
 
 
     void Start()                                            // Start
