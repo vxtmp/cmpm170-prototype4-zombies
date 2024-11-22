@@ -172,6 +172,40 @@ public class GridManager : MonoBehaviour
         Debug.Log(gridString);
     }
 
+    public Vector2 getDestinationNeighbor (Vector2 position)
+    {
+        return getLowestNeighbor(position);
+    }
+
+    public Vector2 getHighestNeighbor (Vector2 position)
+    {
+        int x = getTileX(position);
+        int y = getTileY(position);
+        float highestWeight = float.MinValue;
+        Cell highestCell = null;
+        Vector2[] allNeighbors = combineArray(getNeighbors(position), getDiagonalNeighbors(position));
+
+        foreach (Vector2 neighbor in allNeighbors)
+        {
+            int nx = (int)neighbor.x;
+            int ny = (int)neighbor.y;
+            if (grid[ny][nx].pathingWeight > highestWeight)
+            {
+                highestWeight = grid[ny][nx].pathingWeight;
+                highestCell = grid[ny][nx];
+            }
+        }
+        return highestCell.position;
+    }
+
+
+    public Vector2[] combineArray(Vector2[] a1, Vector2[] a2)
+    {
+        Vector2[] combined = new Vector2[a1.Length + a2.Length];
+        a1.CopyTo(combined, 0);
+        a2.CopyTo(combined, a1.Length);
+        return combined;
+    }
     public Vector2 getLowestNeighbor(Vector2 position)
     {
         int x = getTileX(position);
@@ -180,36 +214,17 @@ public class GridManager : MonoBehaviour
         // return the cell with the lowest pathingWeight
         float lowestWeight = float.MaxValue;
         Cell lowestCell = null;
-        if (y > 0)
+
+        Vector2[] allNeighbors = combineArray(getNeighbors(position), getDiagonalNeighbors(position));
+
+        foreach (Vector2 neighbor in allNeighbors)
         {
-            if (grid[y - 1][x].pathingWeight < lowestWeight)
+            int nx = (int)neighbor.x;
+            int ny = (int)neighbor.y;
+            if (grid[ny][nx].pathingWeight < lowestWeight)
             {
-                lowestWeight = grid[y - 1][x].pathingWeight;
-                lowestCell = grid[y - 1][x];
-            }
-        }
-        if (y < grid.Count - 1)
-        {
-            if (grid[y + 1][x].pathingWeight < lowestWeight)
-            {
-                lowestWeight = grid[y + 1][x].pathingWeight;
-                lowestCell = grid[y + 1][x];
-            }
-        }
-        if (x > 0)
-        {
-            if (grid[y][x - 1].pathingWeight < lowestWeight)
-            {
-                lowestWeight = grid[y][x - 1].pathingWeight;
-                lowestCell = grid[y][x - 1];
-            }
-        }
-        if (x < grid[y].Count - 1)
-        {
-            if (grid[y][x + 1].pathingWeight < lowestWeight)
-            {
-                lowestWeight = grid[y][x + 1].pathingWeight;
-                lowestCell = grid[y][x + 1];
+                lowestWeight = grid[ny][nx].pathingWeight;
+                lowestCell = grid[ny][nx];
             }
         }
         return lowestCell.position;
