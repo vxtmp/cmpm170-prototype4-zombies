@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2086187982238523349}
   - component: {fileID: 2215370127912352521}
+  - component: {fileID: 1468972394771039062}
   m_Layer: 0
   m_Name: AcquisitionRange
   m_TagString: Untagged
@@ -67,6 +68,18 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 3
+--- !u!114 &1468972394771039062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 406861357783202139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4c1a85ffa5cdef47b0e3481cad62de2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8927084352962186645
 GameObject:
   m_ObjectHideFlags: 0
@@ -77,6 +90,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3395180673828476341}
   - component: {fileID: 6378268931537905457}
+  - component: {fileID: 6781542899954662993}
   m_Layer: 0
   m_Name: Zombie
   m_TagString: Untagged
@@ -152,3 +166,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &6781542899954662993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8927084352962186645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40c79a4e1e6325d46bc56bfd5fa18ac3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  zombieAcqRangeObj: {fileID: 406861357783202139}
+  health: 5
+  damage: 2

@@ -795,18 +795,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6378268931537905457, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
-      propertyPath: m_Color.b
-      value: 0.34170523
-      objectReference: {fileID: 0}
-    - target: {fileID: 6378268931537905457, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
-      propertyPath: m_Color.g
-      value: 0.34170523
-      objectReference: {fileID: 0}
-    - target: {fileID: 6378268931537905457, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
-      propertyPath: m_Color.r
-      value: 0.764151
-      objectReference: {fileID: 0}
     - target: {fileID: 8927084352962186645, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
       propertyPath: m_Name
       value: Zombie
@@ -889,6 +877,22 @@ PrefabInstance:
       propertyPath: zombie
       value: 
       objectReference: {fileID: 1965854169}
+    - target: {fileID: 857648840639864371, guid: e0e1edd399672154ab90fcb5ce449b99, type: 3}
+      propertyPath: zombieTargetTags.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 857648840639864371, guid: e0e1edd399672154ab90fcb5ce449b99, type: 3}
+      propertyPath: zombieTargetTags.Array.data[0]
+      value: Human
+      objectReference: {fileID: 0}
+    - target: {fileID: 857648840639864371, guid: e0e1edd399672154ab90fcb5ce449b99, type: 3}
+      propertyPath: zombieTargetTags.Array.data[1]
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 857648840639864371, guid: e0e1edd399672154ab90fcb5ce449b99, type: 3}
+      propertyPath: zombieTargetTags.Array.data[2]
+      value: Door
+      objectReference: {fileID: 0}
     - target: {fileID: 6888213657790459844, guid: e0e1edd399672154ab90fcb5ce449b99, type: 3}
       propertyPath: m_RootOrder
       value: 7

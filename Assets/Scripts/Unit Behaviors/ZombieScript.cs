@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class ZombieScript : MonoBehaviour
 {
+    // References to child object (components)
+    [SerializeField] private GameObject zombieAcqRangeObj;
+    private ZombieAcquisitionRange acquisitionRange;
+
     public int health = 5;
     [SerializeField] private int damage = 2;
 
@@ -18,6 +22,7 @@ public class ZombieScript : MonoBehaviour
     void Start()                                            // Start
     {
         nearbyTargets = new List<GameObject>();
+        acquisitionRange = zombieAcqRangeObj.GetComponent<ZombieAcquisitionRange>();
     }
 
 
@@ -107,7 +112,7 @@ public class ZombieScript : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("Human") || collision.gameObject.CompareTag("Player"))
         {
-            //attack
+            // do damage to collided human/player
         }
     }
 }
