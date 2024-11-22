@@ -666,6 +666,8 @@ MonoBehaviour:
   floorPrefab: {fileID: 6920494878633241495, guid: c14601e12a98617479d28084c4e7a2ae, type: 3}
   startingPointPrefab: {fileID: 7997886033908645680, guid: 3d4a81c5a3342a94cacbddbc615f112b, type: 3}
   debugSquare: {fileID: 3720639818557735427, guid: addb939937c975a46a548fa3b0fc3fa6, type: 3}
+  DEBUG_HUE_DEFAULT0POINT7: 0.7
+  DEBUG_DISTANCE_DEFAULT30: 30
 --- !u!1 &1737398784 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2653401682549717308, guid: 672d43a4a219aa940b3a4660caff1f22, type: 3}
@@ -792,6 +794,18 @@ PrefabInstance:
     - target: {fileID: 3395180673828476341, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6378268931537905457, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
+      propertyPath: m_Color.b
+      value: 0.34170523
+      objectReference: {fileID: 0}
+    - target: {fileID: 6378268931537905457, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
+      propertyPath: m_Color.g
+      value: 0.34170523
+      objectReference: {fileID: 0}
+    - target: {fileID: 6378268931537905457, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
+      propertyPath: m_Color.r
+      value: 0.764151
       objectReference: {fileID: 0}
     - target: {fileID: 8927084352962186645, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
       propertyPath: m_Name
