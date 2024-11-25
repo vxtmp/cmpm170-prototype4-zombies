@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour
 {
+    private GameObject objectToMove;
+
     public const float PLAYER_SPEED = 5.0f;
 
     public float GLOBAL_AGGRO_INTERVAL = 5.0f;
@@ -28,6 +30,15 @@ public class PlayerBehavior : MonoBehaviour
         }
         // move
         parseWASD();
+
+        // move obstacle
+        if (Input.GetKey(KeyCode.Space))
+        {
+            if(objectToMove)
+            {
+                // move around object
+            }
+        }
     }
 
     public void parseWASD()
@@ -73,6 +84,35 @@ public class PlayerBehavior : MonoBehaviour
             else if (direction.y == 0)  this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -90.0f);
             else if (direction.y > 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -45.0f);
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Item")) {
+            //if (items.Count < 6)
+            {
+                //Inventory.instance.Add(collision.gameObject);
+                // remove from map
+            }
+        }
+
+        if (collision.gameObject.CompareTag("Obstacle")) {
+            objectToMove = collision.gameObject;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Obstacle"))
+        {
+            objectToMove = null;
+        }
+    }
+
+    private void Remove(GameObject item) 
+    {
+     //   items.Remove(item);
+        // use or throw
     }
 
 }
