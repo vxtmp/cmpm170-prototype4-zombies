@@ -16,7 +16,7 @@ public class Inventory : MonoBehaviour
     public OnItemChanged onItemChangedCallback;
 
 
-    public List<GameObject> items = new List<GameObject>();
+    public List<Item> items = new List<Item>();
     private int maxSpace = 6;
 
     // Start is called before the first frame update
@@ -31,7 +31,7 @@ public class Inventory : MonoBehaviour
         
     }
 
-    public bool Add(GameObject item)
+    public bool Add(Item item)
     {
         if (items.Count < maxSpace)
         { 
@@ -44,7 +44,7 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public void Remove(GameObject item)
+    public void Remove(Item item)
     {
         items.Remove(item);
         onItemChangedCallback.Invoke();

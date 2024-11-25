@@ -13,4 +13,9 @@ public class Item : ScriptableObject
     public bool weapon = false;
     public int damage = 0;
     public int health = 2;      // usage amount for weapons, health for thrown object
+
+    public virtual void Use()
+    {
+        Debug.Log("Using " + name);
+    }
 }
