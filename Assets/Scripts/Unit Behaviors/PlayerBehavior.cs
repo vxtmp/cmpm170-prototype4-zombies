@@ -89,11 +89,10 @@ public class PlayerBehavior : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Item")) {
-            //if (items.Count < 6)
+            if(Inventory.instance.Add(collision.gameObject))
             {
-                //Inventory.instance.Add(collision.gameObject);
                 // remove from map
-            }
+            } 
         }
 
         if (collision.gameObject.CompareTag("Obstacle")) {
@@ -111,8 +110,9 @@ public class PlayerBehavior : MonoBehaviour
 
     private void Remove(GameObject item) 
     {
-     //   items.Remove(item);
         // use or throw
+        Inventory.instance.Remove(item);
+        
     }
 
 }
