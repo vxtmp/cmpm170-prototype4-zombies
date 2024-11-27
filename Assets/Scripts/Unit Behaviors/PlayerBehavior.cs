@@ -88,27 +88,27 @@ public class PlayerBehavior : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Item")) {
-            if(Inventory.instance.Add(collision.gameObject))
-            {
-                // remove from map
-            } 
-        }
+        //if (collision.gameObject.CompareTag("Item")) {
+        //if(Inventory.instance.Add(collision.gameObject))
+        //{
+        //    // remove from map
+        //} 
+        //}
 
-        if (collision.gameObject.CompareTag("Obstacle")) {
-            objectToMove = collision.gameObject;
-        }
+        //if (collision.gameObject.CompareTag("Obstacle")) {
+        //    objectToMove = collision.gameObject;
+        //}
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Obstacle"))
-        {
-            objectToMove = null;
-        }
+        //if (collision.gameObject.CompareTag("Obstacle"))
+        //{
+        //    objectToMove = null;
+        //}
     }
 
-    private void Remove(GameObject item) 
+    private void Remove(Item item) 
     {
         // use or throw
         Inventory.instance.Remove(item);
