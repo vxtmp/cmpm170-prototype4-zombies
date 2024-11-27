@@ -36,9 +36,9 @@ public class GridManager : MonoBehaviour
                                           // KEEP THIS AT 1.0f
                                           // 90% sure it will break something if you change it.
 
-    [SerializeField] private bool USE_SOUND_PATHING = false;
-    [SerializeField] private float PATHING_VOLUME_CUTOFF = .5f; // volume cutoff for sound-based pathing.
-    [SerializeField] private float VOLUME_FALLOFF = 0.1f; // volume falloff for sound-based pathing.
+    private bool USE_SOUND_PATHING = false;
+    private float PATHING_VOLUME_CUTOFF = .5f; // volume cutoff for sound-based pathing.
+    private float VOLUME_FALLOFF = 0.1f; // volume falloff for sound-based pathing.
 
     // . = floor
     // | = wall
@@ -188,9 +188,9 @@ public class GridManager : MonoBehaviour
     public void recalcPathing(Vector2 worldSpacePos, float volume = 50.0f)
     {
         if (USE_SOUND_PATHING)
-            recalcFlowmapVolume(worldSpacePos, volume);
+            StartCoroutine(recalcFlowmapVolume(worldSpacePos, volume));
         else
-            recalcFlowmapWeights(worldSpacePos);
+            StartCoroutine(recalcFlowmapWeights(worldSpacePos));
     }
     private Vector2 getLoudestNeighbor(Vector2 position)
     {
@@ -252,8 +252,9 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    private void recalcFlowmapWeights(Vector2 worldSpacePos)
+    private IEnumerator recalcFlowmapWeights(Vector2 worldSpacePos)
     {
+        float startTime = Time.realtimeSinceStartup;
         // breadth first search of grid starting at origin point x, y
         // set pathingWeight of each cell to the distance from x, y
         // initialize all pathingWeights to -1 to indicate unvisited.
@@ -327,8 +328,11 @@ public class GridManager : MonoBehaviour
                     grid[ny][nx].pathingWeight = int.MaxValue; // set to max value to indicate impassable
                 }
             }
+            yield return null;
         }
         Debug.Log(debugMessage);
+        float endTime = Time.realtimeSinceStartup;
+        Debug.Log("Time to calculate flowmap: " + (endTime - startTime) + " seconds.");
     }
 
     private void resetDebugPool()
@@ -346,8 +350,9 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    private void recalcFlowmapVolume(Vector2 worldSpacePos, float originVolume)
+    private IEnumerator recalcFlowmapVolume(Vector2 worldSpacePos, float originVolume)
     {
+        float startTime = Time.realtimeSinceStartup;
         // breadth first search of grid starting at origin point x, y
         // set pathingWeight of each cell to the distance from x, y
         // initialize all pathingWeights to -1 to indicate unvisited.
@@ -448,8 +453,11 @@ public class GridManager : MonoBehaviour
                     spawnDebugSquare(nx, ny, grid[ny][nx].pathingVolume);
                 }
             }
+            yield return null;
         }
         Debug.Log(debugMessage);
+        float endTime = Time.realtimeSinceStartup;
+        Debug.Log("Time to calculate flowmap: " + (endTime - startTime) + " seconds.");
     }
 
     // Start is called before the first frame update
