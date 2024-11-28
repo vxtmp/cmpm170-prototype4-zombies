@@ -5,9 +5,13 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     // Object references. Set in inspector.
-    [SerializeField] private GameObject player; 
-                public GameObject getPlayer() { return player; }
-                public Vector2 getPlayerPosition() { return player.transform.position; }
+    [SerializeField] private GameObject player;
+    [SerializeField] private GameObject ItemPrefab;
+    [SerializeField] private Item Food;
+    [SerializeField] private Item Gun;
+    [SerializeField] private Item Rock;
+    public GameObject getPlayer() { return player; }
+    public Vector2 getPlayerPosition() { return player.transform.position; }
 
 
     // Singleton
