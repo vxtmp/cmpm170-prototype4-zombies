@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,13 +33,13 @@ public class PlayerBehavior : MonoBehaviour
         parseWASD();
 
         // move obstacle
-        if (Input.GetKey(KeyCode.Space))
+        /*if (Input.GetKey(KeyCode.Space))
         {
             if(objectToMove)
             {
                 // move around object
             }
-        }
+        }*/
     }
 
     public void parseWASD()
@@ -88,17 +89,18 @@ public class PlayerBehavior : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        //if (collision.gameObject.CompareTag("Item")) {
-        //if(Inventory.instance.Add(collision.gameObject))
-        //{
-        //    // remove from map
-        //} 
-        //}
+        if (collision.gameObject.CompareTag("Item"))
+        {
+            /*if (Inventory.instance.Add(collision.transform.))
+            {
 
-        //if (collision.gameObject.CompareTag("Obstacle")) {
+            }*/
+        }//if (collision.gameObject.CompareTag("Obstacle")) {
         //    objectToMove = collision.gameObject;
         //}
     }
+
+        
 
     private void OnCollisionExit2D(Collision2D collision)
     {
