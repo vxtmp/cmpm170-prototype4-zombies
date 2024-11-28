@@ -6,6 +6,18 @@ using UnityEngine;
 public class PlayerBehavior : MonoBehaviour
 {
     private GameObject objectToMove;
+    private Item curItem;
+    [SerializeField] private GameObject ItemPrefab;
+
+    public int health;
+    [SerializeField] private int maxHealth;
+    public int hunger;
+    [SerializeField] private int maxHunger;
+
+    private bool throwing = false;
+    private bool moving = false;
+    [SerializeField] private float maxThrowRange = 10.0f;
+    [SerializeField] private float bulletSpeed;
 
     public const float PLAYER_SPEED = 5.0f;
 
@@ -14,7 +26,8 @@ public class PlayerBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        health = maxHealth;
+        hunger = maxHunger;
     }
 
     // Update is called once per frame
@@ -40,6 +53,86 @@ public class PlayerBehavior : MonoBehaviour
                 // move around object
             }
         }*/
+
+        // use/throw item
+        if (Input.GetKey(KeyCode.E))
+        {
+            if(curItem)
+            {
+                if (curItem.consumable)
+                {
+                    health += curItem.hungerSatisfaction;
+                    if (health > maxHealth)
+                    {
+                        health = maxHealth;
+                    }
+                    curItem.RemoveFromInventory();
+                }
+                else if (curItem.weapon)
+                {
+                    Shoot();
+                }
+                else
+                {
+                    throwing = true;
+                }
+            }
+        }
+
+        if(throwing && Input.GetMouseButtonDown(0))
+        {
+            Throw();
+            throwing = false;
+        }
+    }
+
+    private void Shoot()
+    {
+        if (curItem.health > 0)
+        {
+            GameObject bullet = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
+            bullet.GetComponent<Rigidbody>().velocity = transform.forward * bulletSpeed;
+            curItem.health--;
+        }
+        
+        if(curItem.health <= 0)
+        {
+            curItem.RemoveFromInventory();
+        }
+    }
+    private void Throw()
+    {
+        Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        Vector3 targetPoint;
+
+        if (Physics.Raycast(mouseRay, out hit))
+        {
+            targetPoint = hit.point;
+        }
+        else
+        {
+            // Otherwise, project a point forward in the direction of the ray
+            targetPoint = mouseRay.GetPoint(maxThrowRange);
+        }
+
+        // Calculate direction and clamp distance to maxThrowRange
+        Vector3 throwDirection = targetPoint - transform.position;
+        if (throwDirection.magnitude > maxThrowRange)
+        {
+            throwDirection = throwDirection.normalized * maxThrowRange;
+        }
+
+        // Instantiate the object and apply force
+        GameObject thrownObject = Instantiate(ItemPrefab, transform.position, Quaternion.identity);
+        thrownObject.GetComponent<ItemInteractable>().SetUp(curItem);
+        Rigidbody rb = thrownObject.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.AddForce(throwDirection.normalized * 0.5f, ForceMode.Impulse);
+        }
+
+        curItem.RemoveFromInventory();
     }
 
     public void parseWASD()
@@ -91,10 +184,10 @@ public class PlayerBehavior : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Item"))
         {
-            /*if (Inventory.instance.Add(collision.transform.))
+            if (Inventory.instance.Add(collision.gameObject.GetComponent<ItemInteractable>().item))
             {
-
-            }*/
+                Destroy(collision.gameObject);
+            }
         }//if (collision.gameObject.CompareTag("Obstacle")) {
         //    objectToMove = collision.gameObject;
         //}
@@ -109,12 +202,4 @@ public class PlayerBehavior : MonoBehaviour
         //    objectToMove = null;
         //}
     }
-
-    private void Remove(Item item) 
-    {
-        // use or throw
-        Inventory.instance.Remove(item);
-        
-    }
-
 }

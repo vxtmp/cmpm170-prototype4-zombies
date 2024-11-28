@@ -4,14 +4,17 @@ using UnityEngine;
 
 public class ItemInteractable : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public Item item;
+    public SpriteRenderer spriteRenderer;
+
+    private void Start()
     {
-        
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    void PickUp()
+    public void SetUp(Item newItem)
     {
-        Destroy(gameObject);
+        item = newItem;
+        spriteRenderer.sprite = item.icon;
     }
 }
