@@ -17,7 +17,6 @@ public class PlayerBehavior : MonoBehaviour
     private bool throwing = false;
     private bool moving = false;
     [SerializeField] private float maxThrowRange = 10.0f;
-    [SerializeField] private float bulletSpeed;
 
     public const float PLAYER_SPEED = 5.0f;
 
@@ -91,7 +90,9 @@ public class PlayerBehavior : MonoBehaviour
         if (curItem.health > 0)
         {
             GameObject bullet = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
-            bullet.GetComponent<Rigidbody>().velocity = transform.forward * bulletSpeed;
+            BulletScript script = bullet.GetComponent<BulletScript>();
+            bullet.GetComponent<Rigidbody>().velocity = transform.forward * script.bulletSpeed;
+            script.damage = curItem.damage;
             curItem.health--;
         }
         
@@ -184,6 +185,7 @@ public class PlayerBehavior : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Item"))
         {
+            Debug.Log("pick up item");
             if (Inventory.instance.Add(collision.gameObject.GetComponent<ItemInteractable>().item))
             {
                 Destroy(collision.gameObject);

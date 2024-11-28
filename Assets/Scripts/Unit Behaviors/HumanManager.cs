@@ -6,7 +6,9 @@ public class HumanManager : MonoBehaviour
 {
     [SerializeField] private GameObject humanPrefab;
     public List<GameObject> instHumans = new List<GameObject>();
-    [SerializeField] private List<GameObject> items;
+
+    [SerializeField] private List<Item> items;
+    [SerializeField] private GameObject ItemPrefab;
 
     [SerializeField] private float chanceNoItem = 0.10f;
     [SerializeField] private float chanceTwoItems = 0.90f;
@@ -23,22 +25,24 @@ public class HumanManager : MonoBehaviour
         Quaternion rotation = new Quaternion(0,0,0,0);
         GameObject humanObj = Instantiate(humanPrefab, new Vector2(x,y), rotation, transform);
         instHumans.Add(humanObj);
-        chooseItem(humanObj);
+        ChooseItem(humanObj);
+        instHumans.Remove(humanObj);
+        humanObj.GetComponent<HumanScript>().DropItems();
     }
 
-    private void chooseItem(GameObject human)
+    private void ChooseItem(GameObject human)
     {
-        float chance = Random.Range(0, 1);
+        float chance = Random.Range(0f, 1f);
         if (chance > chanceNoItem)
         {
             int rand = Random.Range(0, items.Count);
-            human.GetComponent<HumanScript>().item.Add(items[rand]);
+            human.GetComponent<HumanScript>().items.Add(items[rand]);
         }
 
         if (chance > chanceTwoItems)
         {
             int rand = Random.Range(0, items.Count);
-            human.GetComponent<HumanScript>().item.Add(items[rand]);
+            human.GetComponent<HumanScript>().items.Add(items[rand]);
         }
     }
 }

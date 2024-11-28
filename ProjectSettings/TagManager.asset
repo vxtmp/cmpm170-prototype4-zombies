@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Wall
   - Item
+  - Attack
+  - Zombie
   layers:
   - Default
   - TransparentFX
@@ -42,4 +44,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Items
+    uniqueID: 2533918125
     locked: 0

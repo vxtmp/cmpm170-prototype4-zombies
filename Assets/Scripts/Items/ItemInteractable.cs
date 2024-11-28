@@ -7,11 +7,6 @@ public class ItemInteractable : MonoBehaviour
     public Item item;
     public SpriteRenderer spriteRenderer;
 
-    private void Start()
-    {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-    }
-
     public void SetUp(Item newItem)
     {
         item = newItem;

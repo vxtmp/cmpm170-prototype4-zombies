@@ -30,6 +30,7 @@ public class GridManager : MonoBehaviour
     public GameObject wallPrefab;
     public GameObject floorPrefab;
     public GameObject startingPointPrefab;
+    public HumanManager humanManager;
 
     private const float TILE_SIZE = 1.0f; // Used by spawnObject() to space out the spawned prefabs.
                                           // Used by getTileX and getTileY to convert world space to grid space.
@@ -44,12 +45,12 @@ public class GridManager : MonoBehaviour
     // | = wall
     // s = starting point
     // any other character = empty space (null)
-    // 
+    // h = human spawn point
     string gridString =
         "||||||||||||||||||||||||||\n" +
-        "|.......................|\n" +
-        "|.|.....................|\n" +
-        "|.|.....................|\n" +
+        "|..........|.h.|........|\n" +
+        "|.|........|...|........|\n" +
+        "|.|........||.||........|\n" +
         "|.|.....................|\n" +
         "|.|.....................|\n" +
         "|.|.....................|\n" +
@@ -164,6 +165,12 @@ public class GridManager : MonoBehaviour
                             i * TILE_SIZE + TILE_SIZE / 2,
                             0);
                         startingPoint = new Vector2(j * TILE_SIZE, i * TILE_SIZE);
+                        break;
+                    case 'h':
+                        newCell = new Cell(floorPrefab,
+                                              j, i);
+                        humanManager.InstantiateHuman(j * TILE_SIZE + TILE_SIZE / 2,
+                            i * TILE_SIZE + TILE_SIZE / 2);
                         break;
                     default:
                         newCell = null;
