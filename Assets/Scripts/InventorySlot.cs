@@ -7,13 +7,20 @@ public class InventorySlot : MonoBehaviour
     public Image imgComponent;
 
     public Item item;
+
+    public bool selected;
     private Button btn;
+    private Color pressed;
+    private string pressHex = "#C8C8C8";
+
     [SerializeField] private PlayerBehavior playerBehavior;
 
     void Start()
     {
         btn = GetComponent<Button>();
         imgComponent.enabled = false;
+        ColorUtility.TryParseHtmlString(pressHex, out Color color);
+        pressed = color;
     }
     public void AddItem(Item newItem)
     {
@@ -29,14 +36,26 @@ public class InventorySlot : MonoBehaviour
         imgComponent.enabled = false;
     }
 
-    public void TaskShoot()
+    public void TaskOnClick()
     {
-        playerBehavior.curItem = item;
-        if(item.name == "Gun")
+        selected = !selected;
+        if(selected == true)
         {
-            playerBehavior.Shoot();
+            ColorBlock colorBlock = btn.colors;
+            colorBlock.normalColor = pressed;
+            btn.colors = colorBlock;
+            playerBehavior.curItem = item;
         }
+        else
+        {
+            ColorBlock colorBlock = btn.colors;
+            colorBlock.normalColor = Color.white;
+            btn.colors = colorBlock;
+            playerBehavior.curItem = null;
+        }
+        
     }
+
 
     /*public void UseItem()
     {

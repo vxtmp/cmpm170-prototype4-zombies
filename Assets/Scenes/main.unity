@@ -245,7 +245,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8657762732479592606, guid: c5e189944c14ce24088cc9dfff77ff4e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: TaskShoot
+      value: TaskOnClick
       objectReference: {fileID: 0}
     - target: {fileID: 8657762732479592606, guid: c5e189944c14ce24088cc9dfff77ff4e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -823,7 +823,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8657762732479592606, guid: c5e189944c14ce24088cc9dfff77ff4e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: TaskShoot
+      value: TaskOnClick
       objectReference: {fileID: 0}
     - target: {fileID: 8657762732479592606, guid: c5e189944c14ce24088cc9dfff77ff4e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -976,7 +976,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8657762732479592606, guid: c5e189944c14ce24088cc9dfff77ff4e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: TaskShoot
+      value: TaskOnClick
       objectReference: {fileID: 0}
     - target: {fileID: 8657762732479592606, guid: c5e189944c14ce24088cc9dfff77ff4e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -1577,7 +1577,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8657762732479592606, guid: c5e189944c14ce24088cc9dfff77ff4e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: TaskShoot
+      value: TaskOnClick
       objectReference: {fileID: 0}
     - target: {fileID: 8657762732479592606, guid: c5e189944c14ce24088cc9dfff77ff4e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -1808,7 +1808,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8657762732479592606, guid: c5e189944c14ce24088cc9dfff77ff4e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: TaskShoot
+      value: TaskOnClick
       objectReference: {fileID: 0}
     - target: {fileID: 8657762732479592606, guid: c5e189944c14ce24088cc9dfff77ff4e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -2431,7 +2431,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8657762732479592606, guid: c5e189944c14ce24088cc9dfff77ff4e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: TaskShoot
+      value: TaskOnClick
       objectReference: {fileID: 0}
     - target: {fileID: 8657762732479592606, guid: c5e189944c14ce24088cc9dfff77ff4e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
