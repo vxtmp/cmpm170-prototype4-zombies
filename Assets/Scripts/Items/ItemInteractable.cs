@@ -10,6 +10,6 @@ public class ItemInteractable : MonoBehaviour
     public void SetUp(Item newItem)
     {
         item = newItem;
-        spriteRenderer.sprite = item.icon;
+        spriteRenderer.sprite = item.iconSprite;
     }
 }

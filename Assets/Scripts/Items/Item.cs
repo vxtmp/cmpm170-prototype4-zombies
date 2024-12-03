@@ -5,7 +5,7 @@ using static UnityEngine.RuleTile.TilingRuleOutput;
 public class Item : ScriptableObject
 {
     new public string name = "Item";
-    public Sprite icon;
+    public Sprite iconSprite;
 
     // consumable items
     public bool consumable = true;
