@@ -52,7 +52,7 @@ public class GridManager : MonoBehaviour
     string gridString =
         "||||||||||||||||||||||||||\n" +
         "|..........|...|........|\n" +
-        "|.|........|...|...h....|\n" +
+        "|.|........|.h.|........|\n" +
         "|.|........||d||........|\n" +
         "|.|.....................|\n" +
         "|.|.....................|\n" +
@@ -739,7 +739,7 @@ public class GridManager : MonoBehaviour
     {
         return new Vector2(getTileX(coords), getTileY(coords));
     }
-    Vector2[] getNeighbors(Vector2 position)
+    public Vector2[] getNeighbors(Vector2 position)
     {
         int x = getTileX(position);
         int y = getTileY(position);
@@ -762,7 +762,7 @@ public class GridManager : MonoBehaviour
         }
         return neighbors.ToArray();
     }
-    Vector2[] getDiagonalNeighbors(Vector2 position)
+    public Vector2[] getDiagonalNeighbors(Vector2 position)
     {
         int x = getTileX(position);
         int y = getTileY(position);
