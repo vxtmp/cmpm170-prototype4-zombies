@@ -22,10 +22,13 @@ public class DoorBehavior : MonoBehaviour
         if (healthChanged)
         {
             currentHealth += healthDelta;
+            healthDelta = 0;
             healthChanged = false;
+            Debug.Log ("healthChanged: " + currentHealth);
         }
         if (currentHealth <= 0)
         {
+            Debug.Log("door destroyed");
             Destroy(this.gameObject);
         }
     }

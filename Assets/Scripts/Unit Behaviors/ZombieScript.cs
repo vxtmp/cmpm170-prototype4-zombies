@@ -100,14 +100,14 @@ public class ZombieScript : MonoBehaviour
         string collTag = collision.gameObject.tag;
         if (bumpTimer > 0)
         {
-            Debug.Log("zombie bump on cd, bump timer: " + bumpTimer + "\n");
             return;
         }
+        GameObject collObj = collision.gameObject;
         switch (collTag)
         {
             case "Player":
                 Debug.Log("Zombie bumped player\n");
-                GameManager.Instance.getPlayer().GetComponent<PlayerBehavior>().takeDamage(ZOMBIE_ATTACK_POWER);
+                collObj.GetComponent<PlayerBehavior>()!.takeDamage(ZOMBIE_ATTACK_POWER);
                 bumpTimer = BUMP_COOLDOWN_SECONDS;
                 break;
             case "Human":
@@ -116,6 +116,7 @@ public class ZombieScript : MonoBehaviour
                 break;
             case "Door":
                 Debug.Log("Zombie bumped door\n");
+                collObj.GetComponent<DoorBehavior>()!.takeDamage(ZOMBIE_ATTACK_POWER);
                 bumpTimer = BUMP_COOLDOWN_SECONDS;
                 break;
             default:

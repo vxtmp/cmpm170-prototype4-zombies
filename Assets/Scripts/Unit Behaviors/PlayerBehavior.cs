@@ -90,7 +90,9 @@ public class PlayerBehavior : MonoBehaviour
         if (healthChanged)
         {
             health = health + healthDelta;
+            healthDelta = 0;
             healthChanged = false;
+            Debug.Log("healthChanged: " + health);
         }
     }
 
@@ -217,6 +219,7 @@ public class PlayerBehavior : MonoBehaviour
 
     public void takeDamage(int damageValue)
     {
+        Debug.Log("player takeDmg:" + damageValue);
         healthDelta -= damageValue;
         healthChanged = true;
     }

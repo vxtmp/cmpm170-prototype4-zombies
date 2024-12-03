@@ -183,7 +183,9 @@ public class GridManager : MonoBehaviour
                             i * TILE_SIZE + TILE_SIZE / 2);
                         break;
                     case 'd':
-                        newCell = new Cell(doorPrefab, j, i);
+                        newCell = new Cell(floorPrefab, j, i);
+                        // create a door there as well
+                        Instantiate(doorPrefab, new Vector3(j * TILE_SIZE + TILE_SIZE / 2, i * TILE_SIZE + TILE_SIZE / 2, 0), Quaternion.identity);
                         break;
                     default:
                         newCell = null;
