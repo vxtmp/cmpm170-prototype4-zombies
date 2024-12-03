@@ -7,7 +7,7 @@ public class HumanScript : MonoBehaviour
 {
     private bool moving = true;
     private Vector2 dest;
-    public float speed = 30.0f;
+    public float speed = 50.0f;
     public float max_speed = 20.0f;
     // human inventory
     public List<Item> items = new List<Item>();
@@ -81,7 +81,7 @@ public class HumanScript : MonoBehaviour
         {
             if (Random.Range(0, 9) % 2 == 0)
             {
-                posArray = GridManager.Instance.getNeighbors(this.transform.position);
+                posArray = GridManager.Instance.getViableNeighbors(this.transform.position);
                 this.dest = posArray[Random.Range(0, posArray.Length)];
                 //Debug.Log(this.transform.position);
                

@@ -27,7 +27,7 @@ public class HumanManager : MonoBehaviour
         instHumans.Add(humanObj);
         ChooseItem(humanObj);
         instHumans.Remove(humanObj);
-        humanObj.GetComponent<HumanScript>().DropItems();
+        //humanObj.GetComponent<HumanScript>().DropItems();
     }
 
     private void ChooseItem(GameObject human)

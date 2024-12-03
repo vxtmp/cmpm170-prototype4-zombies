@@ -808,4 +808,19 @@ public class GridManager : MonoBehaviour
         return neighbors.ToArray();
     }
 
+    public Vector2[] getViableNeighbors(Vector2 position)
+    {
+        Vector2[] neighbors = getNeighbors(position);
+        List<Vector2> vNeighbors = new List<Vector2>();
+
+        for (int i = 0; i < neighbors.Length; i++)
+        {
+            if (tileIsEnemyPathable((int)neighbors[i].x, (int)neighbors[i].y) && !isInvalidPath((int)neighbors[i].x, (int)neighbors[i].y))
+            {
+                Debug.Log(neighbors[i]);
+                vNeighbors.Add(neighbors[i]);
+            }
+        }
+        return vNeighbors.ToArray();
+    }
 }
