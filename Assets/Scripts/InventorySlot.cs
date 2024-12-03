@@ -31,6 +31,7 @@ public class InventorySlot : MonoBehaviour
 
     public void TaskShoot()
     {
+        playerBehavior.curItem = item;
         if(item.name == "Gun")
         {
             playerBehavior.Shoot();

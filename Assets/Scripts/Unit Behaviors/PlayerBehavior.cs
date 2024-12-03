@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerBehavior : MonoBehaviour
 {
     private GameObject objectToMove;
-    private Item curItem;
+    public Item curItem;
     [SerializeField] private GameObject ItemPrefab;
 
     public int health;
