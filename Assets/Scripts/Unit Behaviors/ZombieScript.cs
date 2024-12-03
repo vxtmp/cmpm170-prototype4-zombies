@@ -14,7 +14,7 @@ public class ZombieScript : MonoBehaviour
     [SerializeField] private int ZOMBIE_ATTACK_POWER = 2;
 
 
-    // Inspector Constants.
+    // Zombie Stats
     private bool PHYSICS_BASED = true; // Switch between physics-based move / not.
     private float PHYSICS_BASE_SPEED = 50.0f;
     private float PHYSICS_MAX_SPEED = 20.0f;
