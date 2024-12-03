@@ -22,10 +22,11 @@ public class GridManager : MonoBehaviour
 
     // NOTE DO NOT ADJUST HERE. ADJUST IN INSPECTOR IN PLAYMODE.
     // NOTE DO NOT ADJUST HERE. ADJUST IN INSPECTOR IN PLAYMODE.
-    [SerializeField] private bool DEBUG_CLICK_FLOWMAP = false; // enables click to generate + show flowmap.
+    private bool DEBUG_CLICK_FLOWMAP = false; // enables click to generate + show flowmap.
                                                    // should be false in final build.
                                                    // Note: HIGH OVERHEAD. DO NOT USE IN FINAL BUILD.
     [SerializeField] private bool DEBUG_FLOW_VOLUME = false;
+    [SerializeField] private bool DEBUG_LOG_PERFORMANCE = false;
 
     public GameObject wallPrefab;
     public GameObject floorPrefab;
@@ -37,7 +38,7 @@ public class GridManager : MonoBehaviour
                                           // KEEP THIS AT 1.0f
                                           // 90% sure it will break something if you change it.
 
-    private bool USE_SOUND_PATHING = false;
+    private bool USE_SOUND_PATHING = true;
     private float PATHING_VOLUME_CUTOFF = .5f; // volume cutoff for sound-based pathing.
     private float VOLUME_FALLOFF = 0.1f; // volume falloff for sound-based pathing.
 
@@ -123,6 +124,13 @@ public class GridManager : MonoBehaviour
     public List<List<Cell>> grid;
     private Vector2 startingPoint;
 
+    // create a bool flag to use as a MUTEX
+    // when there is a recalcFlowmap operation going on, the flag will be set
+    private bool FLOWMAP_RECALC_IN_PROGRESS = false;
+    // create a queue to store subsequent operation calls. it will need to store parameters for the functions too
+    private Queue<Vector2> pathingQueue_Pos = new Queue<Vector2>();
+    private Queue<float> pathingQueue_Volume = new Queue<float>(); // combine the two queues into just one queue using pair object
+
 
     // Grid             gridString
     // 4                0 1 2 3 4
@@ -194,6 +202,13 @@ public class GridManager : MonoBehaviour
     }
     public void recalcPathing(Vector2 worldSpacePos, float volume = 50.0f)
     {
+        if (FLOWMAP_RECALC_IN_PROGRESS)
+        {
+            pathingQueue_Pos.Enqueue(worldSpacePos);
+            pathingQueue_Volume.Enqueue(volume);
+            return;
+        }
+        FLOWMAP_RECALC_IN_PROGRESS = true;
         if (USE_SOUND_PATHING)
             StartCoroutine(recalcFlowmapVolume(worldSpacePos, volume));
         else
@@ -337,9 +352,20 @@ public class GridManager : MonoBehaviour
             }
             yield return null;
         }
-        Debug.Log(debugMessage);
-        float endTime = Time.realtimeSinceStartup;
-        Debug.Log("Time to calculate flowmap: " + (endTime - startTime) + " seconds.");
+        if (DEBUG_LOG_PERFORMANCE)
+        {
+            Debug.Log(debugMessage);
+            float endTime = Time.realtimeSinceStartup;
+            Debug.Log("Time to calculate flowmap: " + (endTime - startTime) + " seconds. Queue size: " + pathingQueue_Pos.Count);
+        }
+
+        FLOWMAP_RECALC_IN_PROGRESS = false;
+        if (pathingQueue_Pos.Count > 0)
+        {
+            Vector2 nextPos = pathingQueue_Pos.Dequeue();
+            float nextVolume = pathingQueue_Volume.Dequeue();
+            recalcPathing(nextPos, nextVolume);
+        }
     }
 
     private void resetDebugPool()
@@ -462,9 +488,21 @@ public class GridManager : MonoBehaviour
             }
             yield return null;
         }
-        Debug.Log(debugMessage);
-        float endTime = Time.realtimeSinceStartup;
-        Debug.Log("Time to calculate flowmap: " + (endTime - startTime) + " seconds.");
+
+        if (DEBUG_LOG_PERFORMANCE)
+        {
+            Debug.Log(debugMessage);
+            float endTime = Time.realtimeSinceStartup;
+            Debug.Log("Time to calculate flowmap: " + (endTime - startTime) + " seconds. Queue size: " + pathingQueue_Pos.Count);
+        }
+
+        FLOWMAP_RECALC_IN_PROGRESS = false;
+        if (pathingQueue_Pos.Count > 0)
+        {
+            Vector2 nextPos = pathingQueue_Pos.Dequeue();
+            float nextVolume = pathingQueue_Volume.Dequeue();
+            recalcPathing(nextPos, nextVolume);
+        }
     }
 
     // Start is called before the first frame update
