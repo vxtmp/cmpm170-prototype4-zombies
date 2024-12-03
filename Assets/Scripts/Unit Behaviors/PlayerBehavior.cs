@@ -96,7 +96,7 @@ public class PlayerBehavior : MonoBehaviour
         }
     }
 
-    private void Shoot()
+    public void Shoot()
     {
         if (curItem.health > 0)
         {
