@@ -8,6 +8,11 @@ public class InventorySlot : MonoBehaviour
 
     public Item item;
 
+
+    void Start()
+    {
+        imgComponent.enabled = false;
+    }
     public void AddItem(Item newItem)
     {
         item = newItem;
