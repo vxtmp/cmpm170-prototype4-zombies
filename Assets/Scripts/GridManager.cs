@@ -817,7 +817,7 @@ public class GridManager : MonoBehaviour
         {
             if (tileIsEnemyPathable((int)neighbors[i].x, (int)neighbors[i].y) && !isInvalidPath((int)neighbors[i].x, (int)neighbors[i].y))
             {
-                Debug.Log(neighbors[i]);
+                //Debug.Log(neighbors[i]);
                 vNeighbors.Add(neighbors[i]);
             }
         }
