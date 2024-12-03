@@ -51,7 +51,6 @@ public class InventorySlot : MonoBehaviour
             ColorBlock colorBlock = btn.colors;
             colorBlock.normalColor = Color.white;
             btn.colors = colorBlock;
-            playerBehavior.curItem = null;
         }
         
     }

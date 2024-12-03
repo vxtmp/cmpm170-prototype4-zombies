@@ -57,7 +57,7 @@ public class PlayerBehavior : MonoBehaviour
         }*/
 
         // use/throw item
-        if (Input.GetKey(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             if(curItem)
             {
