@@ -49,6 +49,7 @@ MonoBehaviour:
   wallPrefab: {fileID: 879456527903638107, guid: 319c7741c51232642be3924ed3c14ec2, type: 3}
   floorPrefab: {fileID: 6920494878633241495, guid: c14601e12a98617479d28084c4e7a2ae, type: 3}
   doorPrefab: {fileID: 6920494878633241495, guid: 0c5f6133b6171b4459bcb571ef5d2691, type: 3}
+  zombiePrefab: {fileID: 8927084352962186645, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
   startingPointPrefab: {fileID: 7997886033908645680, guid: 3d4a81c5a3342a94cacbddbc615f112b, type: 3}
   humanManager: {fileID: 200967546948834915, guid: 65380e11b018c8f42bdf6833699b2d9c, type: 3}
   debugSquare: {fileID: 3720639818557735427, guid: addb939937c975a46a548fa3b0fc3fa6, type: 3}

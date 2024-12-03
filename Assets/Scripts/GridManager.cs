@@ -31,6 +31,7 @@ public class GridManager : MonoBehaviour
     public GameObject wallPrefab;
     public GameObject floorPrefab;
     public GameObject doorPrefab;
+    public GameObject zombiePrefab;
     public GameObject startingPointPrefab;
     public HumanManager humanManager;
 
@@ -49,16 +50,17 @@ public class GridManager : MonoBehaviour
     // s = starting point
     // any other character = empty space (null)
     // h = human spawn point
+    // z = zombies x10
     string gridString =
         "||||||||||||||||||||||||||\n" +
         "|..........|...|........|\n" +
         "|.|........|...|...h....|\n" +
         "|.|........||d||........|\n" +
+        "|.|................zzzzz|\n" +
         "|.|.....................|\n" +
-        "|.|.....................|\n" +
-        "|.|.....................|\n" +
-        "|.|.....................|\n" +
-        "|.|.....................|\n" +
+        "|.|................zzz..|\n" +
+        "|.|................zzz..|\n" +
+        "|.|................zzz..|\n" +
         "|s|.....................|\n" +
         "||||||||||||||||||||||||||";
         //"||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n" +
@@ -184,8 +186,11 @@ public class GridManager : MonoBehaviour
                         break;
                     case 'd':
                         newCell = new Cell(floorPrefab, j, i);
-                        // create a door there as well
                         Instantiate(doorPrefab, new Vector3(j * TILE_SIZE + TILE_SIZE / 2, i * TILE_SIZE + TILE_SIZE / 2, 0), Quaternion.identity);
+                        break;
+                    case 'z':
+                        newCell = new Cell(floorPrefab, j, i);
+                        Instantiate(zombiePrefab, new Vector3(j * TILE_SIZE + TILE_SIZE / 2, i * TILE_SIZE + TILE_SIZE / 2, 0), Quaternion.identity);
                         break;
                     default:
                         newCell = null;
