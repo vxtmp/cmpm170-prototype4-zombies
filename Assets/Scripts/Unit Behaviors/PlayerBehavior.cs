@@ -22,6 +22,9 @@ public class PlayerBehavior : MonoBehaviour
 
     public float GLOBAL_AGGRO_INTERVAL = 5.0f;
     private float global_aggro_timer = 0.0f;
+
+    public int healthDelta = 0;
+    public bool healthChanged = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -82,6 +85,12 @@ public class PlayerBehavior : MonoBehaviour
         {
             Throw();
             throwing = false;
+        }
+
+        if (healthChanged)
+        {
+            health = health + healthDelta;
+            healthChanged = false;
         }
     }
 
@@ -203,5 +212,12 @@ public class PlayerBehavior : MonoBehaviour
         //{
         //    objectToMove = null;
         //}
+    }
+
+
+    public void takeDamage(int damageValue)
+    {
+        healthDelta -= damageValue;
+        healthChanged = true;
     }
 }

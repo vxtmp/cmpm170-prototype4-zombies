@@ -11,7 +11,7 @@ public class ZombieScript : MonoBehaviour
     Rigidbody2D rb;
 
     public int health = 5;
-    [SerializeField] private int damage = 2;
+    [SerializeField] private int ZOMBIE_ATTACK_POWER = 2;
 
 
     // Inspector Constants.
@@ -49,6 +49,10 @@ public class ZombieScript : MonoBehaviour
             moveSelf(direction);
         }
 
+        if (bumpTimer > 0)
+        {
+            bumpTimer -= Time.deltaTime;
+        }
     }
 
 
@@ -103,6 +107,7 @@ public class ZombieScript : MonoBehaviour
         {
             case "Player":
                 Debug.Log("Zombie bumped player\n");
+                GameManager.Instance.getPlayer().GetComponent<PlayerBehavior>().takeDamage(ZOMBIE_ATTACK_POWER);
                 bumpTimer = BUMP_COOLDOWN_SECONDS;
                 break;
             case "Human":
