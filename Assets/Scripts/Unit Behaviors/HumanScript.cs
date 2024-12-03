@@ -5,17 +5,21 @@ using UnityEngine;
 
 public class HumanScript : MonoBehaviour
 {
-    private bool moving = false;
+    private bool moving = true;
     private Vector2 dest;
-    public float speed = 50.0f;
+    public float speed = 30.0f;
+    public float max_speed = 20.0f;
     // human inventory
     public List<Item> items = new List<Item>();
     [SerializeField] private GameObject ItemPrefab;
     public int health = 10;
 
+    Rigidbody2D rb;
+
     // Start is called before the first frame update
     void Start()
     {
+        rb = this.GetComponent<Rigidbody2D>();
         Debug.Log(this.transform.position);
         StartCoroutine(idleMove());
     }
@@ -23,15 +27,23 @@ public class HumanScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (this.moving == true)
+        if (this.moving)
         {
-            Vector3 direction = this.dest - (Vector2)this.transform.position;
-            direction.Normalize();
-            this.transform.position += direction * Time.deltaTime * speed;
-            if ((Vector2)this.transform.position == this.dest)
-            {
-                this.moving = false;
-            }
+            move();
+        }
+    }
+
+    private void move()
+    {
+        Vector3 direction = this.dest - (Vector2)this.transform.position;
+        direction.Normalize();
+
+        // norman's movey code
+        rb.AddForce(direction * Time.deltaTime * this.speed);
+        // Clamp velocity to max speed
+        if (rb.velocity.magnitude > this.max_speed)
+        {
+            rb.velocity = rb.velocity.normalized * this.max_speed;
         }
     }
 
@@ -67,15 +79,27 @@ public class HumanScript : MonoBehaviour
         Vector2[] posArray;
         for (; ; )
         {
-            if (this.moving == false)
+            if (Random.Range(0, 9) % 2 == 0)
             {
                 posArray = GridManager.Instance.getNeighbors(this.transform.position);
-                //Vector2[] arr2 = GridManager.Instance.getDiagonalNeighbors(this.transform.position);
-                //posArray = GridManager.Instance.combineArray(arr1, arr2);
                 this.dest = posArray[Random.Range(0, posArray.Length)];
-                Debug.Log(this.dest);
-                this.moving = true;
+                //Debug.Log(this.transform.position);
+               
+                //if (this.moving == false)
+                //{
+                //    posArray = GridManager.Instance.getNeighbors(this.transform.position);
+                //    //Vector2[] arr2 = GridManager.Instance.getDiagonalNeighbors(this.transform.position);
+                //    //posArray = GridManager.Instance.combineArray(arr1, arr2);
+                //    this.dest = posArray[Random.Range(0, posArray.Length)];
+                //    Debug.Log(this.dest);
+                //    this.moving = true;
+                //}
             }
+            else
+            {
+                this.dest = this.transform.position;
+            }
+            
             yield return new WaitForSeconds(Random.Range(0.5f, 8.0f));
         }
         
