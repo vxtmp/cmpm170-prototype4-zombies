@@ -102,7 +102,7 @@ public class PlayerBehavior : MonoBehaviour
         {
             GameObject bullet = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
             BulletScript script = bullet.GetComponent<BulletScript>();
-            bullet.GetComponent<Rigidbody2D>().velocity = transform.forward * script.bulletSpeed;
+            bullet.GetComponent<Rigidbody2D>().velocity = transform.up * script.bulletSpeed;
             script.damage = curItem.damage;
             curItem.health--;
         }
