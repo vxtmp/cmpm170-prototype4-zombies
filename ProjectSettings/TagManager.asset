@@ -8,6 +8,8 @@ TagManager:
   - Item
   - Attack
   - Zombie
+  - Door
+  - Human
   layers:
   - Default
   - TransparentFX

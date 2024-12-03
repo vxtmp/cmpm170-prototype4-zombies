@@ -30,6 +30,7 @@ public class GridManager : MonoBehaviour
 
     public GameObject wallPrefab;
     public GameObject floorPrefab;
+    public GameObject doorPrefab;
     public GameObject startingPointPrefab;
     public HumanManager humanManager;
 
@@ -44,6 +45,7 @@ public class GridManager : MonoBehaviour
 
     // . = floor
     // | = wall
+    // d = door
     // s = starting point
     // any other character = empty space (null)
     // h = human spawn point
@@ -51,7 +53,7 @@ public class GridManager : MonoBehaviour
         "||||||||||||||||||||||||||\n" +
         "|..........|.h.|........|\n" +
         "|.|........|...|........|\n" +
-        "|.|........||.||........|\n" +
+        "|.|........||d||........|\n" +
         "|.|.....................|\n" +
         "|.|.....................|\n" +
         "|.|.....................|\n" +
@@ -179,6 +181,9 @@ public class GridManager : MonoBehaviour
                                               j, i);
                         humanManager.InstantiateHuman(j * TILE_SIZE + TILE_SIZE / 2,
                             i * TILE_SIZE + TILE_SIZE / 2);
+                        break;
+                    case 'd':
+                        newCell = new Cell(doorPrefab, j, i);
                         break;
                     default:
                         newCell = null;

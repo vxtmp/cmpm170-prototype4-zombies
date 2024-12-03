@@ -44,11 +44,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89913123884af2146b0f6eacc4b300f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DEBUG_CLICK_FLOWMAP: 0
   DEBUG_FLOW_VOLUME: 0
+  DEBUG_LOG_PERFORMANCE: 0
   wallPrefab: {fileID: 879456527903638107, guid: 319c7741c51232642be3924ed3c14ec2, type: 3}
   floorPrefab: {fileID: 6920494878633241495, guid: c14601e12a98617479d28084c4e7a2ae, type: 3}
+  doorPrefab: {fileID: 6920494878633241495, guid: 0c5f6133b6171b4459bcb571ef5d2691, type: 3}
   startingPointPrefab: {fileID: 7997886033908645680, guid: 3d4a81c5a3342a94cacbddbc615f112b, type: 3}
+  humanManager: {fileID: 200967546948834915, guid: 65380e11b018c8f42bdf6833699b2d9c, type: 3}
   debugSquare: {fileID: 3720639818557735427, guid: addb939937c975a46a548fa3b0fc3fa6, type: 3}
   DEBUG_HUE_DEFAULT0POINT7: 0.7
   DEBUG_DISTANCE_DEFAULT30: 30
