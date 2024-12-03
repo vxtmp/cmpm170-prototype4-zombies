@@ -21,6 +21,9 @@ public class ZombieScript : MonoBehaviour
     private float NOT_PHYSICS_BASE_SPEED = 50.0f;
     private float SPEED_MULTIPLIER = 1.0f;
 
+    private const float BUMP_COOLDOWN_SECONDS = 2.0f;
+    private float bumpTimer = 0.0f;
+
 
     void Start()                                            // Start
     {
@@ -87,11 +90,31 @@ public class ZombieScript : MonoBehaviour
 
         return direction;
     }
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.CompareTag("Human") || collision.gameObject.CompareTag("Player"))
+
+        string collTag = collision.gameObject.tag;
+        if (bumpTimer > 0)
         {
-            // do damage to collided human/player
+            Debug.Log("zombie bump on cd, bump timer: " + bumpTimer + "\n");
+            return;
+        }
+        switch (collTag)
+        {
+            case "Player":
+                Debug.Log("Zombie bumped player\n");
+                bumpTimer = BUMP_COOLDOWN_SECONDS;
+                break;
+            case "Human":
+                Debug.Log("Zombie bumped human\n");
+                bumpTimer = BUMP_COOLDOWN_SECONDS;
+                break;
+            case "Door":
+                Debug.Log("Zombie bumped door\n");
+                bumpTimer = BUMP_COOLDOWN_SECONDS;
+                break;
+            default:
+                break;
         }
     }
 }
