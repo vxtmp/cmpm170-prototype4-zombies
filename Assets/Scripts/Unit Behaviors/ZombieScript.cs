@@ -11,7 +11,7 @@ public class ZombieScript : MonoBehaviour
     Rigidbody2D rb;
 
     public int health = 5;
-    [SerializeField] private int damage = 2;
+    [SerializeField] private int ZOMBIE_ATTACK_POWER = 2;
 
 
     // Inspector Constants.
@@ -20,6 +20,9 @@ public class ZombieScript : MonoBehaviour
     private float PHYSICS_MAX_SPEED = 20.0f;
     private float NOT_PHYSICS_BASE_SPEED = 50.0f;
     private float SPEED_MULTIPLIER = 1.0f;
+
+    private const float BUMP_COOLDOWN_SECONDS = 2.0f;
+    private float bumpTimer = 0.0f;
 
 
     void Start()                                            // Start
@@ -46,6 +49,10 @@ public class ZombieScript : MonoBehaviour
             moveSelf(direction);
         }
 
+        if (bumpTimer > 0)
+        {
+            bumpTimer -= Time.deltaTime;
+        }
     }
 
 
@@ -87,11 +94,32 @@ public class ZombieScript : MonoBehaviour
 
         return direction;
     }
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.CompareTag("Human") || collision.gameObject.CompareTag("Player"))
+
+        string collTag = collision.gameObject.tag;
+        if (bumpTimer > 0)
         {
-            // do damage to collided human/player
+            Debug.Log("zombie bump on cd, bump timer: " + bumpTimer + "\n");
+            return;
+        }
+        switch (collTag)
+        {
+            case "Player":
+                Debug.Log("Zombie bumped player\n");
+                GameManager.Instance.getPlayer().GetComponent<PlayerBehavior>().takeDamage(ZOMBIE_ATTACK_POWER);
+                bumpTimer = BUMP_COOLDOWN_SECONDS;
+                break;
+            case "Human":
+                Debug.Log("Zombie bumped human\n");
+                bumpTimer = BUMP_COOLDOWN_SECONDS;
+                break;
+            case "Door":
+                Debug.Log("Zombie bumped door\n");
+                bumpTimer = BUMP_COOLDOWN_SECONDS;
+                break;
+            default:
+                break;
         }
     }
 }
