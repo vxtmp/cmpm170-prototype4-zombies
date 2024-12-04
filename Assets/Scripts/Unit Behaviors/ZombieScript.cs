@@ -98,7 +98,7 @@ public class ZombieScript : MonoBehaviour
     {
 
         string collTag = collision.gameObject.tag;
-        Debug.Log(collTag);
+        //Debug.Log(collTag);
         if (bumpTimer > 0)
         {
             return;
