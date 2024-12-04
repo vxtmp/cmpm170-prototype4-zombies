@@ -28,7 +28,7 @@ public class PlayerBehavior : MonoBehaviour
     public bool healthChanged = false;
     public bool dead = false;
 
-    [SerializeField] private UIManager UIManager;
+    public UIManager UIMan;
     // Start is called before the first frame update
     void Start()
     {
@@ -87,14 +87,14 @@ public class PlayerBehavior : MonoBehaviour
             throwing = false;
         }
 
-        /*if (healthChanged)
-        {
-            health = health + healthDelta;
-            healthDelta = 0;
-            healthChanged = false;
-            Debug.Log("healthChanged: " + health);
-        }*/
-    }
+            /*if (healthChanged)
+            {
+                health = health + healthDelta;
+                healthDelta = 0;
+                healthChanged = false;
+                Debug.Log("healthChanged: " + health);
+            }*/
+        }
 
     public void Shoot()
     {
@@ -219,7 +219,7 @@ public class PlayerBehavior : MonoBehaviour
 
     public void changeHealth(int value)
     {
-        UIManager.healthChange(value);
+        UIMan.healthChange(value);
         Debug.Log("player takeDmg:" + value);
         health += value;
         if(health < 0)
