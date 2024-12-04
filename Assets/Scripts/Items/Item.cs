@@ -14,7 +14,7 @@ public class Item : ScriptableObject
     // weapon/throwable
     public bool weapon = false;
     public GameObject bullet;
-    public int damage = 0;
+    public int damage;
     public int health = 2;      // usage amount for weapons, health for thrown object
 
     public void RemoveFromInventory()

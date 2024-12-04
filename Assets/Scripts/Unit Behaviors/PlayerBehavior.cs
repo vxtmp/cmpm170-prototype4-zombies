@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerBehavior : MonoBehaviour
 {
     private GameObject objectToMove;
-    private Item curItem;
+    public Item curItem;
     [SerializeField] private GameObject ItemPrefab;
 
     public int health;
@@ -57,7 +57,7 @@ public class PlayerBehavior : MonoBehaviour
         }*/
 
         // use/throw item
-        if (Input.GetKey(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             if(curItem)
             {
@@ -96,13 +96,13 @@ public class PlayerBehavior : MonoBehaviour
         }
     }
 
-    private void Shoot()
+    public void Shoot()
     {
         if (curItem.health > 0)
         {
             GameObject bullet = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
             BulletScript script = bullet.GetComponent<BulletScript>();
-            bullet.GetComponent<Rigidbody>().velocity = transform.forward * script.bulletSpeed;
+            bullet.GetComponent<Rigidbody2D>().velocity = transform.up * script.bulletSpeed;
             script.damage = curItem.damage;
             curItem.health--;
         }
