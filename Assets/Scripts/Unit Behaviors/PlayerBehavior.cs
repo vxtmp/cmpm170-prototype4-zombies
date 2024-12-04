@@ -68,6 +68,7 @@ public class PlayerBehavior : MonoBehaviour
                 if (curItem.consumable)
                 {
                     changeHealth(curItem.hungerSatisfaction);
+                    changeHunger(curItem.hungerSatisfaction);
                     curItem.RemoveFromInventory();
                 }
                 else if (curItem.weapon)
@@ -138,10 +139,10 @@ public class PlayerBehavior : MonoBehaviour
         // Instantiate the object and apply force
         GameObject thrownObject = Instantiate(ItemPrefab, transform.position, Quaternion.identity);
         thrownObject.GetComponent<ItemInteractable>().SetUp(curItem);
-        Rigidbody rb = thrownObject.GetComponent<Rigidbody>();
+        Rigidbody2D rb = thrownObject.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
-            rb.AddForce(throwDirection.normalized * 0.5f, ForceMode.Impulse);
+            rb.AddForce(throwDirection.normalized * 10f, ForceMode2D.Impulse);
         }
 
         curItem.RemoveFromInventory();
@@ -226,6 +227,17 @@ public class PlayerBehavior : MonoBehaviour
         {
             dead = true;
             Destroy(gameObject);
+        }
+    }
+
+    public void changeHunger(int value)
+    {
+        UIMan.TakeHngr(value);
+        Debug.Log("player takeDmg:" + value);
+        hunger += value;
+        if (hunger < 0)
+        {
+            changeHealth(-1);
         }
     }
 }

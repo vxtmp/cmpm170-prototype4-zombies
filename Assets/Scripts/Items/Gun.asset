@@ -19,4 +19,4 @@ MonoBehaviour:
   weapon: 1
   bullet: {fileID: 4729064120536813494, guid: 8047229e65998744eab1d9f91399cd43, type: 3}
   damage: 3
-  health: 2
+  health: 5
