@@ -13,6 +13,8 @@ public class HumanScript : MonoBehaviour
     public List<Item> items = new List<Item>();
     [SerializeField] private GameObject ItemPrefab;
     public int health = 10;
+    public int healthDelta = 0;
+    private bool healthChanged = false;
 
     Rigidbody2D rb;
 
@@ -31,6 +33,18 @@ public class HumanScript : MonoBehaviour
         {
             move();
             this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
+        }
+
+        if (healthChanged)
+        {
+            this.health += this.healthDelta;
+            this.healthDelta = 0;
+            this.healthChanged = false;
+            Debug.Log("human health changed: " + this.health);
+            if (this.health <= 0)
+            {
+                DropItems();
+            }
         }
     }
 
@@ -113,7 +127,8 @@ public class HumanScript : MonoBehaviour
 
     public void takeDamage(int damageValue)
     {
-        Debug.Log("human takedmg zombie: " + damageValue);
-        this.health -= damageValue;
+        //Debug.Log("human takedmg zombie: " + damageValue);
+        this.healthDelta -= damageValue;
+        this.healthChanged = true;
     }
 }
