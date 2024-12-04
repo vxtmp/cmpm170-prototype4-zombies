@@ -112,6 +112,7 @@ public class ZombieScript : MonoBehaviour
                 break;
             case "Human":
                 Debug.Log("Zombie bumped human\n");
+                collObj.GetComponent<HumanScript>()!.takeDamage(ZOMBIE_ATTACK_POWER);
                 bumpTimer = BUMP_COOLDOWN_SECONDS;
                 break;
             case "Door":

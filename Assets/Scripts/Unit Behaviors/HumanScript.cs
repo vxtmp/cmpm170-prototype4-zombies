@@ -30,6 +30,7 @@ public class HumanScript : MonoBehaviour
         if (this.moving)
         {
             move();
+            this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
         }
     }
 
@@ -103,5 +104,11 @@ public class HumanScript : MonoBehaviour
             yield return new WaitForSeconds(Random.Range(0.5f, 8.0f));
         }
         
+    }
+
+    public void takeDamage(int damageValue)
+    {
+        Debug.Log("human takedmg zombie: " + damageValue);
+        this.health -= damageValue;
     }
 }
