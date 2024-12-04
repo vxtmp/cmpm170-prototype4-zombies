@@ -11,7 +11,7 @@ public class ZombieScript : MonoBehaviour
     Rigidbody2D rb;
 
     public int health = 5;
-    [SerializeField] private int ZOMBIE_ATTACK_POWER = 2;
+    public int ZOMBIE_ATTACK_POWER = 2;
 
 
     // Zombie Stats

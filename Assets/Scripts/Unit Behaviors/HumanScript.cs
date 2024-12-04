@@ -53,12 +53,17 @@ public class HumanScript : MonoBehaviour
         // zombie attack collision or bullet collisiom
         if (collision.gameObject.CompareTag("Attack"))
         {
-            health -= collision.gameObject.GetComponent<BulletScript>().damage;
-            if(health < 0)
-            {
-                DropItems();
-            }
-            
+            health -= collision.gameObject.GetComponent<BulletScript>().damage;  
+        }
+
+        if (collision.gameObject.CompareTag("Zombie"))
+        {
+            health -= collision.gameObject.GetComponent<ZombieScript>().ZOMBIE_ATTACK_POWER;
+        }
+
+        if (health <= 0)
+        {
+            DropItems();
         }
     }
 
