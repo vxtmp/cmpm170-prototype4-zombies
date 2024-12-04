@@ -113,7 +113,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a131f8937f39f14193fee6f0455a5ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  curItem: {fileID: 0}
+  ItemPrefab: {fileID: 0}
+  health: 10
+  maxHealth: 10
+  hunger: 10
+  maxHunger: 10
+  maxThrowRange: 10
   GLOBAL_AGGRO_INTERVAL: 5
+  healthDelta: 0
+  healthChanged: 0
+  UImanager: {fileID: 8921954236181976662, guid: 91fed7ca9ccc35042bcaec96f23f7b0e, type: 3}
 --- !u!50 &7994002548185455657
 Rigidbody2D:
   serializedVersion: 4

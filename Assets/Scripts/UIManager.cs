@@ -7,10 +7,10 @@ public class UIManager : MonoBehaviour
 {
     [SerializeField] private Image healthBar;
     [SerializeField] private Image hungerBar;
-    public float healthAmt = 100f;
-    public float hungerAmt = 100f;
-    public float totalHealth = 100f;
-    public float totalHunger = 100f;
+    public float healthAmt = 10f;
+    public float hungerAmt = 10f;
+    public float totalHealth = 10f;
+    public float totalHunger = 10f;
 
     // Start is called before the first frame update
     void Start()
