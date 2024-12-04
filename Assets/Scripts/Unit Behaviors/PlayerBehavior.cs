@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour
@@ -25,6 +26,9 @@ public class PlayerBehavior : MonoBehaviour
 
     public int healthDelta = 0;
     public bool healthChanged = false;
+    public bool dead = false;
+
+    [SerializeField] private UIManager UIManager;
     // Start is called before the first frame update
     void Start()
     {
@@ -63,11 +67,7 @@ public class PlayerBehavior : MonoBehaviour
             {
                 if (curItem.consumable)
                 {
-                    health += curItem.hungerSatisfaction;
-                    if (health > maxHealth)
-                    {
-                        health = maxHealth;
-                    }
+                    changeHealth(curItem.hungerSatisfaction);
                     curItem.RemoveFromInventory();
                 }
                 else if (curItem.weapon)
@@ -87,13 +87,13 @@ public class PlayerBehavior : MonoBehaviour
             throwing = false;
         }
 
-        if (healthChanged)
+        /*if (healthChanged)
         {
             health = health + healthDelta;
             healthDelta = 0;
             healthChanged = false;
             Debug.Log("healthChanged: " + health);
-        }
+        }*/
     }
 
     public void Shoot()
@@ -217,10 +217,15 @@ public class PlayerBehavior : MonoBehaviour
     }
 
 
-    public void takeDamage(int damageValue)
+    public void changeHealth(int value)
     {
-        Debug.Log("player takeDmg:" + damageValue);
-        healthDelta -= damageValue;
-        healthChanged = true;
+        UIManager.healthChange(value);
+        Debug.Log("player takeDmg:" + value);
+        health += value;
+        if(health < 0)
+        {
+            dead = true;
+            Destroy(gameObject);
+        }
     }
 }

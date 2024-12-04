@@ -123,7 +123,8 @@ MonoBehaviour:
   GLOBAL_AGGRO_INTERVAL: 5
   healthDelta: 0
   healthChanged: 0
-  UImanager: {fileID: 8921954236181976662, guid: 91fed7ca9ccc35042bcaec96f23f7b0e, type: 3}
+  dead: 0
+  UIManager: {fileID: 8921954236181976662, guid: 91fed7ca9ccc35042bcaec96f23f7b0e, type: 3}
 --- !u!50 &7994002548185455657
 Rigidbody2D:
   serializedVersion: 4

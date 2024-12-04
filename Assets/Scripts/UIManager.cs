@@ -24,28 +24,16 @@ public class UIManager : MonoBehaviour
         
     }
 
-    public void TakeDmg(float dmg)
+    public void healthChange(int change)
     {
-        healthAmt -= dmg;
+        healthAmt += change;
+        healthAmt = Mathf.Clamp(healthAmt, 0, 10);
         healthBar.fillAmount = healthAmt / totalHealth;
     }
     public void TakeHngr(float hngr)
     {
-        hungerAmt -= hngr;
-        hungerBar.fillAmount = hungerAmt / totalHunger;
-    }
-    public void Heal(float health)
-    {
-        healthAmt += health;
-        healthAmt = Mathf.Clamp(healthAmt, 0, 100);
-
-        healthBar.fillAmount = healthAmt / totalHealth;
-    }
-    public void Eat(float food)
-    {
-        hungerAmt += food;
-        hungerAmt = Mathf.Clamp(hungerAmt, 0, 100);
-
+        hungerAmt += hngr;
+        hungerAmt = Mathf.Clamp(hungerAmt, 0, 10);
         hungerBar.fillAmount = hungerAmt / totalHunger;
     }
 }

@@ -108,7 +108,7 @@ public class ZombieScript : MonoBehaviour
         {
             case "Player":
                 Debug.Log("Zombie bumped player\n");
-                collObj.GetComponent<PlayerBehavior>()!.takeDamage(ZOMBIE_ATTACK_POWER);
+                collObj.GetComponent<PlayerBehavior>()!.changeHealth(-ZOMBIE_ATTACK_POWER);
                 bumpTimer = BUMP_COOLDOWN_SECONDS;
                 break;
             case "Human":
