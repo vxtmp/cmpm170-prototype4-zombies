@@ -8,7 +8,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject player;
     
     public GameObject getPlayer() { return player; }
-    public Vector2 getPlayerPosition() { return player.transform.position; }
+
+    private Vector2 lastPlayerPosition = new Vector2(0, 0);
+    public Vector2 getPlayerPosition() {
+        if (player != null)
+        {
+            lastPlayerPosition = player.transform.position;
+        }
+        return lastPlayerPosition;
+    }
 
 
     // Singleton

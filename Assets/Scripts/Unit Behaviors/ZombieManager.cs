@@ -7,6 +7,15 @@ public class ZombieManager : MonoBehaviour
 {
     // Singleton
     public static ZombieManager Instance { get; private set; }
+
+    private int zombieCount = 0;
+    private const int MAX_ZOMBIES = 10;
+
+    private float spawnTimer = 0.0f;
+    private const float SPAWN_INTERVAL = 5.0f;
+    private const float MAX_PER_SPAWN = 0.1f; // max zombies per spawn interval. as % of MAX_ZOMBIES
+                                              // minimum of a max of 1. random between 0 and this value.
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
