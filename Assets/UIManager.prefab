@@ -47,10 +47,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthBar: {fileID: 0}
   hungerBar: {fileID: 0}
-  healthAmt: 100
-  hungerAmt: 100
-  totalHealth: 100
-  totalHunger: 100
+  healthAmt: 10
+  hungerAmt: 10
+  totalHealth: 10
+  totalHunger: 10
 --- !u!114 &4817371431595309152
 MonoBehaviour:
   m_ObjectHideFlags: 0

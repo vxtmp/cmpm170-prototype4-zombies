@@ -7,45 +7,31 @@ public class UIManager : MonoBehaviour
 {
     [SerializeField] private Image healthBar;
     [SerializeField] private Image hungerBar;
-    public float healthAmt = 100f;
-    public float hungerAmt = 100f;
-    public float totalHealth = 100f;
-    public float totalHunger = 100f;
+    public float healthAmt = 10f;
+    public float hungerAmt = 10f;
+    public float totalHealth = 10f;
+    public float totalHunger = 10f;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        
+        StartCoroutine(HungerLower());
     }
-
-    // Update is called once per frame
-    void Update()
+    public void healthChange(float change)
     {
-        
-    }
-
-    public void TakeDmg(float dmg)
-    {
-        healthAmt -= dmg;
+        healthAmt += change;
+        healthAmt = Mathf.Clamp(healthAmt, 0, 10);
         healthBar.fillAmount = healthAmt / totalHealth;
     }
     public void TakeHngr(float hngr)
     {
-        hungerAmt -= hngr;
+        hungerAmt += hngr;
+        hungerAmt = Mathf.Clamp(hungerAmt, 0, 10);
         hungerBar.fillAmount = hungerAmt / totalHunger;
     }
-    public void Heal(float health)
-    {
-        healthAmt += health;
-        healthAmt = Mathf.Clamp(healthAmt, 0, 100);
 
-        healthBar.fillAmount = healthAmt / totalHealth;
-    }
-    public void Eat(float food)
+    IEnumerator HungerLower()
     {
-        hungerAmt += food;
-        hungerAmt = Mathf.Clamp(hungerAmt, 0, 100);
-
-        hungerBar.fillAmount = hungerAmt / totalHunger;
+        yield return new WaitForSeconds(10f);
+        TakeHngr(-0.5f);
     }
 }

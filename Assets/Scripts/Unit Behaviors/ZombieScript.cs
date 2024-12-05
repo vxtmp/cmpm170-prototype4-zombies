@@ -11,7 +11,7 @@ public class ZombieScript : MonoBehaviour
     Rigidbody2D rb;
 
     public int health = 5;
-    [SerializeField] private int ZOMBIE_ATTACK_POWER = 2;
+    public int ZOMBIE_ATTACK_POWER = 2;
 
 
     // Zombie Stats
@@ -98,6 +98,7 @@ public class ZombieScript : MonoBehaviour
     {
 
         string collTag = collision.gameObject.tag;
+        //Debug.Log(collTag);
         if (bumpTimer > 0)
         {
             return;
@@ -107,11 +108,12 @@ public class ZombieScript : MonoBehaviour
         {
             case "Player":
                 Debug.Log("Zombie bumped player\n");
-                collObj.GetComponent<PlayerBehavior>()!.takeDamage(ZOMBIE_ATTACK_POWER);
+                collObj.GetComponent<PlayerBehavior>()!.changeHealth(-ZOMBIE_ATTACK_POWER);
                 bumpTimer = BUMP_COOLDOWN_SECONDS;
                 break;
             case "Human":
                 Debug.Log("Zombie bumped human\n");
+                collObj.GetComponent<HumanScript>()!.takeDamage(ZOMBIE_ATTACK_POWER);
                 bumpTimer = BUMP_COOLDOWN_SECONDS;
                 break;
             case "Door":

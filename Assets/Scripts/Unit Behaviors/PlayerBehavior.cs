@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour
@@ -25,6 +26,9 @@ public class PlayerBehavior : MonoBehaviour
 
     public int healthDelta = 0;
     public bool healthChanged = false;
+    public bool dead = false;
+
+    public UIManager UIMan;
     // Start is called before the first frame update
     void Start()
     {
@@ -57,18 +61,15 @@ public class PlayerBehavior : MonoBehaviour
         }*/
 
         // use/throw item
-        if (Input.GetKey(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             Debug.Log(curItem.name);
             if(curItem)
             {
                 if (curItem.consumable)
                 {
-                    health += curItem.hungerSatisfaction;
-                    if (health > maxHealth)
-                    {
-                        health = maxHealth;
-                    }
+                    changeHealth(curItem.hungerSatisfaction);
+                    changeHunger(curItem.hungerSatisfaction);
                     curItem.RemoveFromInventory();
                 }
                 else if (curItem.weapon)
@@ -88,14 +89,14 @@ public class PlayerBehavior : MonoBehaviour
             throwing = false;
         }
 
-        if (healthChanged)
-        {
-            health = health + healthDelta;
-            healthDelta = 0;
-            healthChanged = false;
-            Debug.Log("healthChanged: " + health);
+            /*if (healthChanged)
+            {
+                health = health + healthDelta;
+                healthDelta = 0;
+                healthChanged = false;
+                Debug.Log("healthChanged: " + health);
+            }*/
         }
-    }
 
     public void Shoot()
     {
@@ -103,7 +104,7 @@ public class PlayerBehavior : MonoBehaviour
         {
             GameObject bullet = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
             BulletScript script = bullet.GetComponent<BulletScript>();
-            bullet.GetComponent<Rigidbody2D>().velocity = transform.forward * script.bulletSpeed;
+            bullet.GetComponent<Rigidbody2D>().velocity = transform.up * script.bulletSpeed;
             script.damage = curItem.damage;
             curItem.health--;
         }
@@ -139,10 +140,10 @@ public class PlayerBehavior : MonoBehaviour
         // Instantiate the object and apply force
         GameObject thrownObject = Instantiate(ItemPrefab, transform.position, Quaternion.identity);
         thrownObject.GetComponent<ItemInteractable>().SetUp(curItem);
-        Rigidbody rb = thrownObject.GetComponent<Rigidbody>();
+        Rigidbody2D rb = thrownObject.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
-            rb.AddForce(throwDirection.normalized * 0.5f, ForceMode.Impulse);
+            rb.AddForce(throwDirection.normalized * 10f, ForceMode2D.Impulse);
         }
 
         curItem.RemoveFromInventory();
@@ -218,10 +219,26 @@ public class PlayerBehavior : MonoBehaviour
     }
 
 
-    public void takeDamage(int damageValue)
+    public void changeHealth(int value)
     {
-        Debug.Log("player takeDmg:" + damageValue);
-        healthDelta -= damageValue;
-        healthChanged = true;
+        UIMan.healthChange(value);
+        Debug.Log("player takeDmg:" + value);
+        health += value;
+        if(health < 0)
+        {
+            dead = true;
+            Destroy(gameObject);
+        }
+    }
+
+    public void changeHunger(int value)
+    {
+        UIMan.TakeHngr(value);
+        Debug.Log("player takeDmg:" + value);
+        hunger += value;
+        if (hunger < 0)
+        {
+            changeHealth(-1);
+        }
     }
 }

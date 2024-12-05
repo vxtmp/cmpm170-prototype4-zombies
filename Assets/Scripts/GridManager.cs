@@ -54,7 +54,7 @@ public class GridManager : MonoBehaviour
     string gridString =
         "||||||||||||||||||||||||||\n" +
         "|..........|...|........|\n" +
-        "|.|........|...|...h....|\n" +
+        "|.|........|.h.|........|\n" +
         "|.|........||d||........|\n" +
         "|.|................zzzzz|\n" +
         "|.|.....................|\n" +
@@ -744,7 +744,7 @@ public class GridManager : MonoBehaviour
     {
         return new Vector2(getTileX(coords), getTileY(coords));
     }
-    Vector2[] getNeighbors(Vector2 position)
+    public Vector2[] getNeighbors(Vector2 position)
     {
         int x = getTileX(position);
         int y = getTileY(position);
@@ -767,7 +767,7 @@ public class GridManager : MonoBehaviour
         }
         return neighbors.ToArray();
     }
-    Vector2[] getDiagonalNeighbors(Vector2 position)
+    public Vector2[] getDiagonalNeighbors(Vector2 position)
     {
         int x = getTileX(position);
         int y = getTileY(position);
@@ -813,4 +813,19 @@ public class GridManager : MonoBehaviour
         return neighbors.ToArray();
     }
 
+    public Vector2[] getViableNeighbors(Vector2 position)
+    {
+        Vector2[] neighbors = getNeighbors(position);
+        List<Vector2> vNeighbors = new List<Vector2>();
+
+        for (int i = 0; i < neighbors.Length; i++)
+        {
+            if (tileIsEnemyPathable((int)neighbors[i].x, (int)neighbors[i].y) && !isInvalidPath((int)neighbors[i].x, (int)neighbors[i].y))
+            {
+                //Debug.Log(neighbors[i]);
+                vNeighbors.Add(neighbors[i]);
+            }
+        }
+        return vNeighbors.ToArray();
+    }
 }
