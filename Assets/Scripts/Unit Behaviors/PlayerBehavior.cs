@@ -59,6 +59,7 @@ public class PlayerBehavior : MonoBehaviour
         // use/throw item
         if (Input.GetKey(KeyCode.E))
         {
+            Debug.Log(curItem.name);
             if(curItem)
             {
                 if (curItem.consumable)

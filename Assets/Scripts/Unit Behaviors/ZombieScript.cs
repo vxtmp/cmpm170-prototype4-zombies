@@ -19,7 +19,7 @@ public class ZombieScript : MonoBehaviour
     private float PHYSICS_BASE_SPEED = 50.0f;
     private float PHYSICS_MAX_SPEED = 20.0f;
     private float NOT_PHYSICS_BASE_SPEED = 50.0f;
-    private float SPEED_MULTIPLIER = 1.0f;
+    private float SPEED_MULTIPLIER = 15.0f;
 
     private const float BUMP_COOLDOWN_SECONDS = 2.0f;
     private float bumpTimer = 0.0f;
