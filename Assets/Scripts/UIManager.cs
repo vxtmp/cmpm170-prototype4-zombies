@@ -14,7 +14,6 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(HungerLower());
     }
     public void healthChange(float change)
     {
@@ -22,16 +21,10 @@ public class UIManager : MonoBehaviour
         healthAmt = Mathf.Clamp(healthAmt, 0, 10);
         healthBar.fillAmount = healthAmt / totalHealth;
     }
-    public void TakeHngr(float hngr)
+    public void hungerChange(float hngr)
     {
         hungerAmt += hngr;
         hungerAmt = Mathf.Clamp(hungerAmt, 0, 10);
         hungerBar.fillAmount = hungerAmt / totalHunger;
-    }
-
-    IEnumerator HungerLower()
-    {
-        yield return new WaitForSeconds(10f);
-        TakeHngr(-0.5f);
     }
 }
