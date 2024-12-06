@@ -10,14 +10,15 @@ TagManager:
   - Zombie
   - Door
   - Human
+  - HumanProjectile
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Walls
   - Water
   - UI
-  - 
+  - HumanBullets
   - 
   - 
   - 

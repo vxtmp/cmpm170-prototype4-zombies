@@ -12,7 +12,7 @@ public class HumanScript : MonoBehaviour
     // human inventory
     public List<Item> items = new List<Item>();
     [SerializeField] private GameObject ItemPrefab;
-    [SerializeField] private GameObject humanBulletPrefab;
+    [SerializeField] private GameObject humanBulletPrefab; 
     public int health = 10;
     public int healthDelta = 0;
     private bool healthChanged = false;
@@ -131,5 +131,10 @@ public class HumanScript : MonoBehaviour
         //Debug.Log("human takedmg zombie: " + damageValue);
         this.healthDelta -= damageValue;
         this.healthChanged = true;
+    }
+
+    public void shoot()
+    {
+        // spawn a prefab of the bullet with slight offset.
     }
 }
