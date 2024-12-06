@@ -10,7 +10,7 @@ public class ZombieScript : MonoBehaviour
 
     Rigidbody2D rb;
 
-    public int health = 5;
+    public float health = 1;
     public int ZOMBIE_ATTACK_POWER = 2;
 
 
@@ -126,6 +126,15 @@ public class ZombieScript : MonoBehaviour
                 break;
             default:
                 break;
+        }
+    }
+
+    public void takeDamage(float damage)
+    {
+        health -= damage;
+        if (health <= 0)
+        {
+            Destroy(this.gameObject);
         }
     }
 }

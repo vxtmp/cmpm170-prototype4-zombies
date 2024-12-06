@@ -17,7 +17,7 @@ public class HumanAcquisitionRange : MonoBehaviour
         if (collisionObj == null) return;
         if (isATarget(collisionObj))
         {
-            Debug.Log("Added object to human target list: " + collisionObj.name);
+            //Debug.Log("Added object to human target list: " + collisionObj.name);
             targetsInRange.Add(collisionObj);
         }
     }

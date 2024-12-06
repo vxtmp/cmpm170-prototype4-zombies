@@ -21,7 +21,7 @@ public class HumanScript : MonoBehaviour
     Rigidbody2D rb;
 
     private float attackTimer = 0.0f;
-    private float ATTACK_COOLDOWN = 5.0f;
+    private float ATTACK_COOLDOWN = 1.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -52,11 +52,21 @@ public class HumanScript : MonoBehaviour
             }
         }
 
-        if (getClosestTarget() && attackTimer <= 0.0f)
+        if (attackTimer <= 0.0f)
         {
-            Debug.Log("attempting to shoot");
-            shoot();
-            attackTimer = ATTACK_COOLDOWN;
+            if (getClosestTarget() != null)
+            {
+                Debug.Log("attempting to shoot");
+                if (getClosestTarget() != null)
+                {
+                    shoot(getClosestTarget());
+                    attackTimer = ATTACK_COOLDOWN;
+                }
+            }
+        }
+        else
+        {
+            attackTimer -= Time.deltaTime;
         }
     }
 
@@ -144,12 +154,27 @@ public class HumanScript : MonoBehaviour
         this.healthChanged = true;
     }
 
-    public void shoot()
+    public void shoot(GameObject target)
     {
         // spawn a prefab of the bullet with slight offset.
         Debug.Log("shoot function called in human");
-        Quaternion quaternion = Quaternion.LookRotation(getClosestTarget().transform.position - this.transform.position, Vector3.up);
-        GameObject bullet = Instantiate(humanBulletPrefab, this.transform.position, quaternion);
+        Vector2 direction = target.transform.position - this.transform.position;
+        direction.Normalize();
+        GameObject bullet = Instantiate(humanBulletPrefab, this.transform.position, Quaternion.identity);
+        //bullet.transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
+        bullet.GetComponent<Rigidbody2D>().AddForce(direction * 10.0f, ForceMode2D.Impulse);
+
+
+        //Quaternion quaternion = Quaternion.LookRotation(gameObject.transform.forward, getClosestTarget().transform.position - this.transform.position);
+        //Vector3 direction = target.transform.position - this.transform.position;
+        //direction.Normalize();
+        //GameObject bullet = Instantiate(humanBulletPrefab, this.transform.position, Quaternion.identity);
+        //bullet.transform.LookAt(target.transform);
+        //bullet.GetComponent<Rigidbody2D>().AddForce(direction * 10.0f, ForceMode2D.Impulse);
+        //if (bullet == null)
+        //{
+        //    Debug.Log("bullet instantiated but null");
+        //}
     }
 
     private GameObject getClosestTarget()
