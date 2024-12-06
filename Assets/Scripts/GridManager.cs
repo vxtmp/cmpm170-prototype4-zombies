@@ -239,17 +239,31 @@ public class GridManager : MonoBehaviour
         Cell highestCell = null;
         Vector2[] allNeighbors = combineArray(getNeighbors(position), getDiagonalNeighbors(position));
 
+        Vector2 firstNeighbor = allNeighbors[0];
+        int fnx = (int)firstNeighbor.x;
+        int fny = (int)firstNeighbor.y;
+        float volume = grid[fny][fnx].pathingVolume;
+
+        bool allNeighborsEqual = true;
         foreach (Vector2 neighbor in allNeighbors)
         {
             int nx = (int)neighbor.x;
             int ny = (int)neighbor.y;
+            if (grid[ny][nx].pathingVolume != volume && allNeighborsEqual)
+            {
+                allNeighborsEqual = false;
+            }
             if (grid[ny][nx].pathingVolume > highestVolume)
             {
                 highestVolume = grid[ny][nx].pathingVolume;
                 highestCell = grid[ny][nx];
             }
         }
-        return highestCell.position;
+
+        if (allNeighborsEqual)
+            return new Vector2(-1, -1);
+        else
+            return highestCell.position;
     }
     private Vector2 getLowestNeighbor(Vector2 position)
     {

@@ -44,9 +44,12 @@ public class ZombieScript : MonoBehaviour
         {
             // move to getLowestNeighbor
             Vector2 dest = GridManager.Instance.getDestinationNeighbor(this.transform.position);
-            Vector3 direction = dest - (Vector2)this.transform.position;
-            direction.Normalize();
-            moveSelf(direction);
+            if (dest != new Vector2(-1, -1))
+            {
+                Vector3 direction = dest - (Vector2)this.transform.position;
+                direction.Normalize();
+                moveSelf(direction);
+            }
         }
 
         if (bumpTimer > 0)
