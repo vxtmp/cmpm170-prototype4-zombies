@@ -12,10 +12,19 @@ public class HumanManager : MonoBehaviour
 
     [SerializeField] private float chanceNoItem = 0.10f;
     [SerializeField] private float chanceTwoItems = 0.90f;
+    // Singleton
+    public static HumanManager Instance { get; private set; }
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     // manage human behavior
@@ -44,5 +53,13 @@ public class HumanManager : MonoBehaviour
             int rand = Random.Range(0, items.Count);
             human.GetComponent<HumanScript>().items.Add(items[rand]);
         }
+    }
+
+    public List<string> getHumanTargets()
+    {
+        List<string> targets = new List<string>();
+        targets.Add("Zombie");
+        targets.Add("Player");
+        return targets;
     }
 }
