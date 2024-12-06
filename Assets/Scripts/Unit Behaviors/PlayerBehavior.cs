@@ -64,7 +64,7 @@ public class PlayerBehavior : MonoBehaviour
         }*/
 
         // use/throw item
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log(curItem.name);
             if(curItem)
