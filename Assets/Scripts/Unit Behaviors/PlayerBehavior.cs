@@ -16,10 +16,7 @@ public class PlayerBehavior : MonoBehaviour
     [SerializeField] private float maxHunger;
     [SerializeField] private float hungerDecay;
     [SerializeField] private float healthDecay;
-
-    private bool throwing = false;
-    private bool moving = false;
-    [SerializeField] private float maxThrowRange = 10.0f;
+    private bool hurt = false;
 
     public const float PLAYER_SPEED = 5.0f;
 
@@ -54,15 +51,6 @@ public class PlayerBehavior : MonoBehaviour
         // move
         parseWASD();
 
-        // move obstacle
-        /*if (Input.GetKey(KeyCode.Space))
-        {
-            if(objectToMove)
-            {
-                // move around object
-            }
-        }*/
-
         // use/throw item
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -81,25 +69,11 @@ public class PlayerBehavior : MonoBehaviour
                 }
                 else
                 {
-                    throwing = true;
+                    Throw();
                 }
             }
         }
-
-        if(throwing && Input.GetMouseButtonDown(0))
-        {
-            Throw();
-            throwing = false;
-        }
-
-            /*if (healthChanged)
-            {
-                health = health + healthDelta;
-                healthDelta = 0;
-                healthChanged = false;
-                Debug.Log("healthChanged: " + health);
-            }*/
-        }
+    }
 
     public void Shoot()
     {
@@ -147,38 +121,12 @@ public class PlayerBehavior : MonoBehaviour
         Vector3 direction = new Vector3(rightDirection, upDirection, 0.0f);
         direction.Normalize();
         moveSelf(direction);
-        //updateRotation(direction);
     }
     private void moveSelf(Vector3 direction)
     {
         this.transform.position += direction * Time.deltaTime * PLAYER_SPEED;
     }
     
-    private void updateRotation(Vector3 direction)
-    {
-        if (direction.x == 0 && direction.y == 0)
-        {
-            // idle
-        }
-        else if (direction.x < 0)
-        {
-            if      (direction.y < 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 135.0f);
-            else if (direction.y == 0)  this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 90.0f);
-            else if (direction.y > 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 45.0f);
-        }
-        else if (direction.x == 0)
-        {
-            if      (direction.y < 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 180.0f);
-            else if (direction.y > 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
-        }
-        else if (direction.x > 0)
-        {
-            if      (direction.y < 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -135.0f);
-            else if (direction.y == 0)  this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -90.0f);
-            else if (direction.y > 0)   this.transform.rotation = Quaternion.Euler(0.0f, 0.0f, -45.0f);
-        }
-    }
-
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Item"))
@@ -188,28 +136,24 @@ public class PlayerBehavior : MonoBehaviour
             {
                 Destroy(collision.gameObject);
             }
-        }//if (collision.gameObject.CompareTag("Obstacle")) {
-        //    objectToMove = collision.gameObject;
-        //}
+        }
     }
-
-        
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        //if (collision.gameObject.CompareTag("Obstacle"))
-        //{
-        //    objectToMove = null;
-        //}
-    }
-
 
     public void changeHealth(float value)
     {
-        UIMan.healthChange(value);
-        //Debug.Log("player takeDmg:" + value);
-        health += value;
-        if(health < 0)
+        Debug.Log("hurt " + hurt + " " +value + " " + health);
+        if(value < 0 && !hurt)
+        {
+            UIMan.healthChange(value);
+            health += value;
+            StartCoroutine(Immune());
+        } else if (value > 0)
+        {
+            UIMan.healthChange(value);
+            health += value;
+        }
+        Debug.Log("health after " + health);
+        if (health < 0)
         {
             dead = true;
             Destroy(gameObject);
@@ -223,6 +167,13 @@ public class PlayerBehavior : MonoBehaviour
         hunger += value;
     }
 
+    IEnumerator Immune()
+    {
+        Debug.Log("immune");
+        hurt = true;
+        yield return new WaitForSeconds(1f);
+        hurt = false;
+    }
     IEnumerator HungerLower()
     {
         yield return new WaitForSeconds(hungerDecay);
