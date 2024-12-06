@@ -136,5 +136,6 @@ public class HumanScript : MonoBehaviour
     public void shoot()
     {
         // spawn a prefab of the bullet with slight offset.
+        Instantiate(humanBulletPrefab, this.transform.position, new Quaternion(0, 0, 0, 0));
     }
 }
