@@ -119,37 +119,19 @@ public class PlayerBehavior : MonoBehaviour
     }
     private void Throw()
     {
-        Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        Vector3 targetPoint;
-
-        if (Physics.Raycast(mouseRay, out hit))
+        if (curItem.health > 0)
         {
-            targetPoint = hit.point;
-        }
-        else
-        {
-            // Otherwise, project a point forward in the direction of the ray
-            targetPoint = mouseRay.GetPoint(maxThrowRange);
+            GameObject rock = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
+            RockScript script = rock.GetComponent<RockScript>();
+            rock.GetComponent<Rigidbody2D>().velocity = transform.up * script.rockSpeed;
+            script.damage = curItem.damage;
+            curItem.health--;
         }
 
-        // Calculate direction and clamp distance to maxThrowRange
-        Vector3 throwDirection = targetPoint - transform.position;
-        if (throwDirection.magnitude > maxThrowRange)
+        if (curItem.health <= 0)
         {
-            throwDirection = throwDirection.normalized * maxThrowRange;
+            curItem.RemoveFromInventory();
         }
-
-        // Instantiate the object and apply force
-        GameObject thrownObject = Instantiate(ItemPrefab, transform.position, Quaternion.identity);
-        thrownObject.GetComponent<ItemInteractable>().SetUp(curItem);
-        Rigidbody2D rb = thrownObject.GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.AddForce(throwDirection.normalized * 10f, ForceMode2D.Impulse);
-        }
-
-        curItem.RemoveFromInventory();
     }
 
     public void parseWASD()
