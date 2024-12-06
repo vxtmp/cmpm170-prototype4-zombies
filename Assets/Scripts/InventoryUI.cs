@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -9,9 +10,12 @@ public class InventoryUI : MonoBehaviour
     InventorySlot[] slots;
 
     Inventory inventory;
+
+    [SerializeField] private TMP_Text text;
     // Start is called before the first frame update
     void Start()
     {
+        text.enabled = false;
         inventory = Inventory.instance;
         inventory.onItemChangedCallback += UpdateUI;
 
@@ -21,6 +25,14 @@ public class InventoryUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (slots.Length > 0)
+        {
+            text.enabled = true;
+        }
+        else
+        {
+            text.enabled = false;
+        }
     }
 
     void UpdateUI()
