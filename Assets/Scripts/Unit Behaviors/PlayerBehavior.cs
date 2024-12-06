@@ -10,10 +10,12 @@ public class PlayerBehavior : MonoBehaviour
     public Item curItem;
     [SerializeField] private GameObject ItemPrefab;
 
-    public int health;
-    [SerializeField] private int maxHealth;
-    public int hunger;
-    [SerializeField] private int maxHunger;
+    public float health;
+    [SerializeField] private float maxHealth;
+    public float hunger;
+    [SerializeField] private float maxHunger;
+    [SerializeField] private float hungerDecay;
+    [SerializeField] private float healthDecay;
 
     private bool throwing = false;
     private bool moving = false;
@@ -34,6 +36,7 @@ public class PlayerBehavior : MonoBehaviour
     {
         health = maxHealth;
         hunger = maxHunger;
+        StartCoroutine(HungerLower());
     }
 
     // Update is called once per frame
@@ -61,7 +64,7 @@ public class PlayerBehavior : MonoBehaviour
         }*/
 
         // use/throw item
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log(curItem.name);
             if(curItem)
@@ -219,10 +222,10 @@ public class PlayerBehavior : MonoBehaviour
     }
 
 
-    public void changeHealth(int value)
+    public void changeHealth(float value)
     {
         UIMan.healthChange(value);
-        Debug.Log("player takeDmg:" + value);
+        //Debug.Log("player takeDmg:" + value);
         health += value;
         if(health < 0)
         {
@@ -231,14 +234,39 @@ public class PlayerBehavior : MonoBehaviour
         }
     }
 
-    public void changeHunger(int value)
+    public void changeHunger(float value)
     {
-        UIMan.TakeHngr(value);
-        Debug.Log("player takeDmg:" + value);
+        UIMan.hungerChange(value);
+        //Debug.Log("player takeDmg:" + value);
         hunger += value;
-        if (hunger < 0)
+    }
+
+    IEnumerator HungerLower()
+    {
+        yield return new WaitForSeconds(hungerDecay);
+        changeHunger(-0.5f);
+        if (hunger <= 0)
         {
-            changeHealth(-1);
+            StartCoroutine(HealthLower());
+        }
+        else
+        {
+            StartCoroutine(HungerLower());
+        }
+
+    }
+
+    IEnumerator HealthLower()
+    {
+        yield return new WaitForSeconds(healthDecay);
+        changeHealth(-0.5f);
+        if (health <= 0)
+        {
+            StartCoroutine(HealthLower());
+        }
+        else
+        {
+            StartCoroutine(HungerLower());
         }
     }
 }

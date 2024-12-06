@@ -119,12 +119,14 @@ MonoBehaviour:
   maxHealth: 10
   hunger: 10
   maxHunger: 10
+  hungerDecay: 3
+  healthDecay: 1
   maxThrowRange: 10
   GLOBAL_AGGRO_INTERVAL: 5
   healthDelta: 0
   healthChanged: 0
   dead: 0
-  UIManager: {fileID: 8921954236181976662, guid: 91fed7ca9ccc35042bcaec96f23f7b0e, type: 3}
+  UIMan: {fileID: 0}
 --- !u!50 &7994002548185455657
 Rigidbody2D:
   serializedVersion: 4
