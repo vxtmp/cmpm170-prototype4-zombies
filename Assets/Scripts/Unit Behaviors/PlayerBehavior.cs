@@ -165,7 +165,7 @@ public class PlayerBehavior : MonoBehaviour
         Vector3 direction = new Vector3(rightDirection, upDirection, 0.0f);
         direction.Normalize();
         moveSelf(direction);
-        updateRotation(direction);
+        //updateRotation(direction);
     }
     private void moveSelf(Vector3 direction)
     {
