@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class HumanBulletBehavior : MonoBehaviour
 {
-    private float speed = 10.0f;
     [SerializeField] private float bulletDamage = 1.0f;
 
     // Start is called before the first frame update

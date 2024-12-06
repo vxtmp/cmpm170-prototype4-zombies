@@ -21,7 +21,10 @@ public class HumanScript : MonoBehaviour
     Rigidbody2D rb;
 
     private float attackTimer = 0.0f;
-    private float ATTACK_COOLDOWN = 1.0f;
+
+    // Human stats. Change these for balance. 
+    private const float ATTACK_COOLDOWN = 1.0f;
+    private const float BULLET_SPEED = 10.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -162,7 +165,7 @@ public class HumanScript : MonoBehaviour
         direction.Normalize();
         GameObject bullet = Instantiate(humanBulletPrefab, this.transform.position, Quaternion.identity);
         //bullet.transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
-        bullet.GetComponent<Rigidbody2D>().AddForce(direction * 10.0f, ForceMode2D.Impulse);
+        bullet.GetComponent<Rigidbody2D>().AddForce(direction * BULLET_SPEED, ForceMode2D.Impulse);
 
 
         //Quaternion quaternion = Quaternion.LookRotation(gameObject.transform.forward, getClosestTarget().transform.position - this.transform.position);
