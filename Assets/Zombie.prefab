@@ -182,7 +182,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zombieAcqRangeObj: {fileID: 406861357783202139}
-  health: 5
+  health: 2
   ZOMBIE_ATTACK_POWER: 2
 --- !u!50 &7004044043688211947
 Rigidbody2D:
