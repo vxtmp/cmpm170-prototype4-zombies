@@ -7,6 +7,8 @@ public class ZombieScript : MonoBehaviour
     // References to child object (components)
     [SerializeField] private GameObject zombieAcqRangeObj;
     private ZombieAcquisitionRange acquisitionRange;
+    [SerializeField] private GameObject zombieAtkRangeObj;
+    private ZombieAttackRange attackRange;
 
     Rigidbody2D rb;
 
@@ -18,12 +20,13 @@ public class ZombieScript : MonoBehaviour
     private bool PHYSICS_BASED = true; // Switch between physics-based move / not.
     private float PHYSICS_BASE_SPEED = 50.0f;
     private float PHYSICS_MAX_SPEED = 20.0f;
-    private float NOT_PHYSICS_BASE_SPEED = 50.0f;
     private float SPEED_MULTIPLIER = 15.0f;
 
     private const float BUMP_COOLDOWN_SECONDS = 2.0f;
     private float bumpTimer = 0.0f;
 
+    // deprecated.
+    private float NOT_PHYSICS_BASE_SPEED = 50.0f;
 
     void Start()                                            // Start
     {
