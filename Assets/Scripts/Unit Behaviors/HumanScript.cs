@@ -12,12 +12,16 @@ public class HumanScript : MonoBehaviour
     // human inventory
     public List<Item> items = new List<Item>();
     [SerializeField] private GameObject ItemPrefab;
-    [SerializeField] private GameObject humanBulletPrefab; 
+    [SerializeField] private GameObject humanBulletPrefab;
+    [SerializeField] private GameObject acquisitionRange;
     public int health = 10;
     public int healthDelta = 0;
     private bool healthChanged = false;
 
     Rigidbody2D rb;
+
+    private float attackTimer = 0.0f;
+    private float ATTACK_COOLDOWN = 5.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -46,6 +50,13 @@ public class HumanScript : MonoBehaviour
             {
                 DropItems();
             }
+        }
+
+        if (getClosestTarget() && attackTimer <= 0.0f)
+        {
+            Debug.Log("attempting to shoot");
+            shoot();
+            attackTimer = ATTACK_COOLDOWN;
         }
     }
 
@@ -136,6 +147,25 @@ public class HumanScript : MonoBehaviour
     public void shoot()
     {
         // spawn a prefab of the bullet with slight offset.
-        Instantiate(humanBulletPrefab, this.transform.position, new Quaternion(0, 0, 0, 0));
+        Debug.Log("shoot function called in human");
+        Quaternion quaternion = Quaternion.LookRotation(getClosestTarget().transform.position - this.transform.position, Vector3.up);
+        GameObject bullet = Instantiate(humanBulletPrefab, this.transform.position, quaternion);
+    }
+
+    private GameObject getClosestTarget()
+    {
+        GameObject closestTarget = null;
+        float closestDistance = Mathf.Infinity;
+        foreach (GameObject target in acquisitionRange.GetComponent<HumanAcquisitionRange>().getTargetsInRange())
+        {
+            if (target == null) break;
+            float distance = Vector2.Distance(this.transform.position, target.transform.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestTarget = target;
+            }
+        }
+        return closestTarget;
     }
 }

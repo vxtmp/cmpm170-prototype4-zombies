@@ -215,7 +215,7 @@ public class GridManager : MonoBehaviour
         if (USE_SOUND_PATHING)
             return getLoudestNeighbor(position);
         else
-            return getLowestNeighbor(position);
+            return getLowestNeighbor(position); // condition check for all neighbors == not implemented yet.
     }
     public void recalcPathing(Vector2 worldSpacePos, float volume = 50.0f)
     {
@@ -261,7 +261,7 @@ public class GridManager : MonoBehaviour
         }
 
         if (allNeighborsEqual)
-            return new Vector2(-1, -1);
+            return new Vector2(-1, -1); // -1, -1 used as a placeholder 
         else
             return highestCell.position;
     }
