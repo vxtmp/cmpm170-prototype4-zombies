@@ -40,7 +40,7 @@ public class ZombieScript : MonoBehaviour
         // if there is nearby target, move towards closest
         if (acquisitionRange.getTargetsInRange().Count > 0)
         {
-            moveSelf(directionToNearestHuman());
+            moveSelf(directionToNearestTarget());
         }
         // else move towards sound.
         else
@@ -80,22 +80,45 @@ public class ZombieScript : MonoBehaviour
     }
 
     // return normal vector direction towards nearest human
-    private Vector3 directionToNearestHuman()
+    private Vector3 directionToNearestTarget()
     {
-        // find the closest human
-        GameObject closestHuman = acquisitionRange.getTargetsInRange()[0];
-        float closestDistance = Vector3.Distance(this.transform.position, closestHuman.transform.position);
-        foreach (GameObject human in acquisitionRange.getTargetsInRange())
+        GameObject closestHuman = null;
+        float closestHumanDistance = float.MaxValue;
+        // find the closest target
+        GameObject closestTarget = acquisitionRange.getTargetsInRange()[0];
+        float closestDistance = Vector3.Distance(this.transform.position, closestTarget.transform.position);
+        // if (closestTarget.tag == "Human"){
+        //     closestHuman = closestTarget;
+        //     closestHumanDistance = closestDistance;
+        // }
+        foreach (GameObject target in acquisitionRange.getTargetsInRange())
         {
-            float distance = Vector3.Distance(this.transform.position, human.transform.position);
-            if (distance < closestDistance)
-            {
-                closestHuman = human;
-                closestDistance = distance;
+            // if (target.tag == "Player"){
+            //     Vector3 pd = target.transform.position - this.transform.position;
+            //     pd.Normalize();
+            //     return pd;
+            // }
+            float distance = Vector3.Distance(this.transform.position, target.transform.position);
+            if (closestHuman == null){
+                if (distance < closestDistance)
+                {
+                    closestTarget = target;
+                    closestDistance = distance;
+                }
+            } else {
+                if (target.tag == "Human" && distance < closestHumanDistance)
+                {
+                    closestHuman = target;
+                    closestHumanDistance = distance;
+                }
             }
         }
+        // if (closestHuman){
+        //     closestTarget = closestHuman;
+        //     closestDistance = closestHumanDistance;
+        // }
         // move towards the closest human
-        Vector3 direction = closestHuman.transform.position - this.transform.position;
+        Vector3 direction = closestTarget.transform.position - this.transform.position;
         direction.Normalize();
 
         return direction;
