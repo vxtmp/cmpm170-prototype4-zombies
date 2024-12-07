@@ -10,7 +10,8 @@ public class RockScript : MonoBehaviour
     private bool hitWall = false;
 
     private Vector2 direction;
-
+    public Vector3 targetPos;
+    private float stopPoint = 0.1f;
     public Rigidbody2D rb;
 
     public void SetDirection(Vector2 shootDirection)
@@ -28,7 +29,14 @@ public class RockScript : MonoBehaviour
     {
         if (!hitWall)
         {
-            transform.Translate(direction * rockSpeed * Time.deltaTime);
+            if (Vector2.Distance(transform.position, targetPos) <= stopPoint)
+            {
+                if (rb != null)
+                {
+                    rb.velocity = Vector2.zero;
+                }
+
+            }
         }
     }
 

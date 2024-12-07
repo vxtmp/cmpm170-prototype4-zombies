@@ -16,7 +16,9 @@ public class PlayerBehavior : MonoBehaviour
     [SerializeField] private float maxHunger;
     [SerializeField] private float hungerDecay;
     [SerializeField] private float healthDecay;
+    [SerializeField] private Camera cam;
     private bool hurt = false;
+    private Vector2 mousePos;
 
     public const float PLAYER_SPEED = 5.0f;
 
@@ -52,7 +54,7 @@ public class PlayerBehavior : MonoBehaviour
         parseWASD();
 
         // use/throw item
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetMouseButtonDown(0))
         {
             Debug.Log(curItem.name);
             if(curItem)
@@ -79,11 +81,22 @@ public class PlayerBehavior : MonoBehaviour
     {
         if (curItem.health > 0)
         {
+            Vector2 playerPos = transform.position;
+            mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 throwDir = (mousePos - playerPos).normalized;
             GameObject bullet = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
+            Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+            BulletScript script = bullet.GetComponent<BulletScript>();
+            rb.velocity = new Vector2(throwDir.x, throwDir.y) * script.bulletSpeed;
+            Vector3 targetPos = new Vector3(mousePos.x, mousePos.y, 0);
+            script.targetPos = targetPos;
+            script.damage = curItem.damage;
+            curItem.health--;
+            /*GameObject bullet = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
             BulletScript script = bullet.GetComponent<BulletScript>();
             bullet.GetComponent<Rigidbody2D>().velocity = transform.up * script.bulletSpeed;
             script.damage = curItem.damage;
-            curItem.health--;
+            curItem.health--;*/
         }
         
         if(curItem.health <= 0)
@@ -95,11 +108,23 @@ public class PlayerBehavior : MonoBehaviour
     {
         if (curItem.health > 0)
         {
+            Vector2 playerPos = transform.position;
+            mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 throwDir = (mousePos - playerPos).normalized;
             GameObject rock = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
+            Rigidbody2D rb = rock.GetComponent<Rigidbody2D>();
             RockScript script = rock.GetComponent<RockScript>();
-            rock.GetComponent<Rigidbody2D>().velocity = transform.up * script.rockSpeed;
+            rb.velocity = new Vector2(throwDir.x, throwDir.y) * script.rockSpeed;
+            Vector3 targetPos = new Vector3(mousePos.x, mousePos.y, 0);
+            script.targetPos = targetPos;
             script.damage = curItem.damage;
             curItem.health--;
+
+            /*GameObject rock = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
+            
+            rock.GetComponent<Rigidbody2D>().velocity = transform.up * script.rockSpeed;
+            script.damage = curItem.damage;
+            curItem.health--;*/
         }
 
         if (curItem.health <= 0)
