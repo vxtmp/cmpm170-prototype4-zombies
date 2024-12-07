@@ -28,14 +28,14 @@ public class BulletScript : MonoBehaviour
     private void Update()
     {
         //transform.Translate(direction * bulletSpeed * Time.deltaTime);
-        if (Vector2.Distance(transform.position, targetPos) <= stopPoint)
+        /*if (Vector2.Distance(transform.position, targetPos) <= stopPoint)
         {
             if (rb != null)
             {
                 rb.velocity = Vector2.zero;
             }
 
-        }
+        }*/
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

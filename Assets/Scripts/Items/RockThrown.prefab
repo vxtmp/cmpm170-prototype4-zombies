@@ -162,6 +162,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 0
-  rockSpeed: 0
-  lifetime: 3
+  rockSpeed: 10
+  targetPos: {x: 0, y: 0, z: 0}
   rb: {fileID: 0}
