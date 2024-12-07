@@ -56,7 +56,7 @@ public class PlayerBehavior : MonoBehaviour
         // use/throw item
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log(curItem.name);
+            //Debug.Log(curItem.name);
             if(curItem)
             {
                 if (curItem.consumable)
@@ -92,11 +92,6 @@ public class PlayerBehavior : MonoBehaviour
             script.targetPos = targetPos;
             script.damage = curItem.damage;
             curItem.health--;
-            /*GameObject bullet = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
-            BulletScript script = bullet.GetComponent<BulletScript>();
-            bullet.GetComponent<Rigidbody2D>().velocity = transform.up * script.bulletSpeed;
-            script.damage = curItem.damage;
-            curItem.health--;*/
         }
         
         if(curItem.health <= 0)
@@ -106,31 +101,17 @@ public class PlayerBehavior : MonoBehaviour
     }
     private void Throw()
     {
-        if (curItem.health > 0)
-        {
-            Vector2 playerPos = transform.position;
-            mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-            Vector2 throwDir = (mousePos - playerPos).normalized;
-            GameObject rock = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
-            Rigidbody2D rb = rock.GetComponent<Rigidbody2D>();
-            RockScript script = rock.GetComponent<RockScript>();
-            rb.velocity = new Vector2(throwDir.x, throwDir.y) * script.rockSpeed;
-            Vector3 targetPos = new Vector3(mousePos.x, mousePos.y, 0);
-            script.targetPos = targetPos;
-            script.damage = curItem.damage;
-            curItem.health--;
-
-            /*GameObject rock = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
-            
-            rock.GetComponent<Rigidbody2D>().velocity = transform.up * script.rockSpeed;
-            script.damage = curItem.damage;
-            curItem.health--;*/
-        }
-
-        if (curItem.health <= 0)
-        {
-            curItem.RemoveFromInventory();
-        }
+        Vector2 playerPos = transform.position;
+        mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 throwDir = (mousePos - playerPos).normalized;
+        GameObject rock = Instantiate(curItem.bullet, transform.position, Quaternion.identity);
+        Rigidbody2D rb = rock.GetComponent<Rigidbody2D>();
+        RockScript script = rock.GetComponent<RockScript>();
+        rb.velocity = new Vector2(throwDir.x, throwDir.y) * script.rockSpeed;
+        Vector3 targetPos = new Vector3(mousePos.x, mousePos.y, 0);
+        script.targetPos = targetPos;
+        script.damage = curItem.damage;
+        curItem.RemoveFromInventory();
     }
 
     public void parseWASD()
@@ -166,7 +147,6 @@ public class PlayerBehavior : MonoBehaviour
 
     public void changeHealth(float value)
     {
-        Debug.Log("hurt " + hurt + " " +value + " " + health);
         if(value < 0 && !hurt)
         {
             UIMan.healthChange(value);
@@ -177,7 +157,6 @@ public class PlayerBehavior : MonoBehaviour
             UIMan.healthChange(value);
             health += value;
         }
-        Debug.Log("health after " + health);
         if (health < 0)
         {
             dead = true;
@@ -188,7 +167,6 @@ public class PlayerBehavior : MonoBehaviour
     public void changeHunger(float value)
     {
         UIMan.hungerChange(value);
-        //Debug.Log("player takeDmg:" + value);
         hunger += value;
     }
 

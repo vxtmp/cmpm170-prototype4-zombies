@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class GridManager : MonoBehaviour
 {
@@ -34,6 +35,9 @@ public class GridManager : MonoBehaviour
     public GameObject zombiePrefab;
     public GameObject startingPointPrefab;
     public HumanManager humanManager;
+    public GameObject ItemPrefab;
+    public Item rock;
+
 
     private const float TILE_SIZE = 1.0f; // Used by spawnObject() to space out the spawned prefabs.
                                           // Used by getTileX and getTileY to convert world space to grid space.
@@ -83,7 +87,7 @@ public class GridManager : MonoBehaviour
     "|.......................................................|........|\n" +
     "|.......z...............................................|....h...|\n" +
     "|....................z..................................||||||||||\n" +
-    "|......z.........................................................|\n" +
+    "|......z.......................r.................................|\n" +
     "|.........................................................z......|\n" +
     "|.................................s.............z................|\n" +
     "|..............||||||||..........................................|\n" +
@@ -196,6 +200,12 @@ public class GridManager : MonoBehaviour
                     case 'z':
                         newCell = new Cell(floorPrefab, j, i);
                         Instantiate(zombiePrefab, new Vector3(j * TILE_SIZE + TILE_SIZE / 2, i * TILE_SIZE + TILE_SIZE / 2, 0), Quaternion.identity);
+                        break;
+                    case 'r':
+                        GameObject itemInstance = Instantiate(ItemPrefab, new Vector3(j * TILE_SIZE + TILE_SIZE / 2, i * TILE_SIZE + TILE_SIZE / 2, 0), Quaternion.identity);
+                        itemInstance.GetComponent<ItemInteractable>().SetUp(rock);
+                        newCell = new Cell(floorPrefab,
+                                              j, i);
                         break;
                     default:
                         newCell = null;

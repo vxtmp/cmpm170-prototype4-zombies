@@ -52,6 +52,8 @@ MonoBehaviour:
   zombiePrefab: {fileID: 8927084352962186645, guid: dd1b88b2c45865941ad5d86f4580d235, type: 3}
   startingPointPrefab: {fileID: 7997886033908645680, guid: 3d4a81c5a3342a94cacbddbc615f112b, type: 3}
   humanManager: {fileID: 200967546948834915, guid: 65380e11b018c8f42bdf6833699b2d9c, type: 3}
+  ItemPrefab: {fileID: 4708699832868438944, guid: 143d87db994e06a4b8118cf01a481a6f, type: 3}
+  rock: {fileID: 11400000, guid: f90767b938a88a446adafc1e96160f21, type: 2}
   debugSquare: {fileID: 3720639818557735427, guid: addb939937c975a46a548fa3b0fc3fa6, type: 3}
   DEBUG_HUE_DEFAULT0POINT7: 0.7
   DEBUG_DISTANCE_DEFAULT30: 30

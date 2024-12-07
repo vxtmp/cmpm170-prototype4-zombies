@@ -13,6 +13,7 @@ public class RockScript : MonoBehaviour
     public Vector3 targetPos;
     private float stopPoint = 0.1f;
     public Rigidbody2D rb;
+    public Item item;
 
     public void SetDirection(Vector2 shootDirection)
     {
@@ -22,6 +23,7 @@ public class RockScript : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        GetComponent<ItemInteractable>().SetUp(item);
         //Destroy(gameObject, lifetime); // Destroy the bullet after `lifetime` seconds
     }
 
@@ -34,6 +36,8 @@ public class RockScript : MonoBehaviour
                 if (rb != null)
                 {
                     rb.velocity = Vector2.zero;
+                    GetComponent<CircleCollider2D>().isTrigger = false;
+                    Debug.Log("here");
                 }
 
             }

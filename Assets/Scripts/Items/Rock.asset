@@ -17,6 +17,6 @@ MonoBehaviour:
   consumable: 0
   hungerSatisfaction: 0
   weapon: 0
-  bullet: {fileID: 0}
+  bullet: {fileID: 4729064120536813494, guid: 5ee3bbf2ea7d4504192133acd80fca2c, type: 3}
   damage: 2
-  health: 4
+  health: 0
