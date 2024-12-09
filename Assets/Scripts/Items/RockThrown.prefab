@@ -181,3 +181,4 @@ MonoBehaviour:
   targetPos: {x: 0, y: 0, z: 0}
   rb: {fileID: 0}
   item: {fileID: 11400000, guid: f90767b938a88a446adafc1e96160f21, type: 2}
+  grid: {fileID: 6912855157368581746, guid: 765311a4cfad2974a82b5f45386ae297, type: 3}

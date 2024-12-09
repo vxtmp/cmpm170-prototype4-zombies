@@ -15,6 +15,8 @@ public class RockScript : MonoBehaviour
     public Rigidbody2D rb;
     public Item item;
 
+    public GridManager grid;
+
     public void SetDirection(Vector2 shootDirection)
     {
         direction = shootDirection.normalized; // Normalize to ensure consistent speed
@@ -37,7 +39,7 @@ public class RockScript : MonoBehaviour
                 {
                     rb.velocity = Vector2.zero;
                     GetComponent<CircleCollider2D>().isTrigger = false;
-                    Debug.Log("here");
+                    grid.recalcPathing(transform.position, 100);
                 }
 
             }
