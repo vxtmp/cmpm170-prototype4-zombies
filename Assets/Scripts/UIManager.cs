@@ -12,7 +12,6 @@ public class UIManager : MonoBehaviour
     public float hungerAmt = 10f;
     public float totalHealth = 10f;
     public float totalHunger = 10f;
-    [SerializeField] private TMP_Text gameoverText;
 
     private void Start()
     {
@@ -28,10 +27,5 @@ public class UIManager : MonoBehaviour
         hungerAmt += hngr;
         hungerAmt = Mathf.Clamp(hungerAmt, 0, 10);
         hungerBar.fillAmount = hungerAmt / totalHunger;
-    }
-
-    public void gameOver()
-    {
-        gameoverText.enabled = true;
     }
 }

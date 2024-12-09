@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEditor.SearchService;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,7 +11,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject player;
     [SerializeField] private HumanManager humanManager;
     [SerializeField] private ZombieManager zombieManager;
-    [SerializeField] private UIManager uiManager;
+    //[SerializeField] private TMP_Text gameoverText;
+    [SerializeField] private GameObject gameoverText;
+    private bool gameover = false;
+
 
     public GameObject getPlayer() { return player; }
 
@@ -45,9 +51,18 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if((humanManager.instHumans.Count == 0 && zombieManager.zombieCount <= 0) || player == null)
+        if(!gameover)
         {
-            uiManager.gameOver();
+            if ((humanManager.instHumans.Count == 0 && zombieManager.zombieCount <= 0) || player == null)
+            {
+                gameoverText.SetActive(true);
+                gameover = true;
+            }
         }
+    }
+
+    public void Reset()
+    {
+        SceneManager.LoadScene("main");
     }
 }
