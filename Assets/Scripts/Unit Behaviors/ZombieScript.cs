@@ -9,6 +9,7 @@ public class ZombieScript : MonoBehaviour
     private ZombieAcquisitionRange acquisitionRange;
     [SerializeField] private GameObject zombieAtkRangeObj;
     private ZombieAttackRange attackRange;
+    public ZombieManager manager;
 
     Rigidbody2D rb;
 
@@ -30,6 +31,7 @@ public class ZombieScript : MonoBehaviour
 
     void Start()                                            // Start
     {
+        manager.zombieCount++;
         rb = this.GetComponent<Rigidbody2D>();
         acquisitionRange = zombieAcqRangeObj.GetComponent<ZombieAcquisitionRange>();
     }
@@ -160,6 +162,7 @@ public class ZombieScript : MonoBehaviour
         health -= damage;
         if (health <= 0)
         {
+            manager.zombieCount--;
             Destroy(this.gameObject);
         }
     }

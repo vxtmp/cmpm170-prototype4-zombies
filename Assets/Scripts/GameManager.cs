@@ -6,7 +6,10 @@ public class GameManager : MonoBehaviour
 {
     // Object references. Set in inspector.
     [SerializeField] private GameObject player;
-    
+    [SerializeField] private HumanManager humanManager;
+    [SerializeField] private ZombieManager zombieManager;
+    [SerializeField] private UIManager uiManager;
+
     public GameObject getPlayer() { return player; }
 
     private Vector2 lastPlayerPosition = new Vector2(0, 0);
@@ -42,6 +45,9 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if((humanManager.instHumans.Count == 0 && zombieManager.zombieCount <= 0) || player == null)
+        {
+            uiManager.gameOver();
+        }
     }
 }

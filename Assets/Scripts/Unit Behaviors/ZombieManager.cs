@@ -8,7 +8,7 @@ public class ZombieManager : MonoBehaviour
     // Singleton
     public static ZombieManager Instance { get; private set; }
 
-    private int zombieCount = 0;
+    public int zombieCount = 0;
     private const int MAX_ZOMBIES = 10;
 
     private float spawnTimer = 0.0f;

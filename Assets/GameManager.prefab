@@ -44,8 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82ce04fd8d679264b885b7ab76661518, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  ItemPrefab: {fileID: 4708699832868438944, guid: 143d87db994e06a4b8118cf01a481a6f, type: 3}
-  Food: {fileID: 11400000, guid: 57dd43a6bc96ebf4aae2ac9f314d347b, type: 2}
-  Gun: {fileID: 11400000, guid: 406560040c1d2694d90d68625582e3ee, type: 2}
-  Rock: {fileID: 11400000, guid: f90767b938a88a446adafc1e96160f21, type: 2}
+  player: {fileID: 733876207069168148, guid: 28838a5c185e4984991dcb995b8128d8, type: 3}
+  humanManager: {fileID: 200967546948834915, guid: 65380e11b018c8f42bdf6833699b2d9c, type: 3}
+  zombieManager: {fileID: 857648840639864371, guid: e0e1edd399672154ab90fcb5ce449b99, type: 3}
+  uiManager: {fileID: 8921954236181976662, guid: 91fed7ca9ccc35042bcaec96f23f7b0e, type: 3}

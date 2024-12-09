@@ -264,6 +264,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   zombieAcqRangeObj: {fileID: 406861357783202139}
   zombieAtkRangeObj: {fileID: 2676377577061714821}
+  manager: {fileID: 857648840639864371, guid: e0e1edd399672154ab90fcb5ce449b99, type: 3}
   health: 2
   ZOMBIE_ATTACK_POWER: 2
 --- !u!50 &7004044043688211947
